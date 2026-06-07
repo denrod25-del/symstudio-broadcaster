@@ -927,6 +927,7 @@ OBSApp::OBSApp(int &argc, char **argv, profiler_name_store_t *store)
 #endif
 
 	setDesktopFileName("com.obsproject.Studio");
+	setApplicationDisplayName("SymStudio");
 
 	pluginManager_ = std::make_unique<OBS::PluginManager>();
 }
