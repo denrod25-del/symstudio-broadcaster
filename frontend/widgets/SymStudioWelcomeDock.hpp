@@ -14,6 +14,16 @@ class SymStudioWelcomeDock : public QWidget {
 public:
 	explicit SymStudioWelcomeDock(OBSBasic *main, QWidget *parent = nullptr);
 
+private slots:
+	void onAddSource();
+	void onToggleStream();
+	void onToggleRecord();
+	void onOpenSettings();
+	void refresh();
+
 private:
 	OBSBasic *main = nullptr;
+	QPushButton *streamBtn = nullptr;
+	QPushButton *recordBtn = nullptr;
+	QTimer *refreshTimer = nullptr;
 };
