@@ -30,6 +30,8 @@
 #ifdef YOUTUBE_ENABLED
 #include <docks/YouTubeAppDock.hpp>
 #endif
+#include <docks/OBSDock.hpp>
+#include "SymStudioWelcomeDock.hpp"
 #include <dialogs/NameDialog.hpp>
 #include <dialogs/OBSAbout.hpp>
 #include <dialogs/OBSBasicAdvAudio.hpp>
@@ -364,6 +366,17 @@ OBSBasic::OBSBasic(QWidget *parent) : OBSMainWindow(parent), undo_s(ui), ui(new 
 	statsDock->setVisible(false);
 	statsDock->setFloating(true);
 	statsDock->resize(700, 200);
+
+	/* --- SymStudio Welcome dock --- */
+	OBSDock *welcomeDock = new OBSDock();
+	welcomeDock->setObjectName(QStringLiteral("symStudioWelcomeDock"));
+	welcomeDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable |
+				 QDockWidget::DockWidgetFloatable);
+	welcomeDock->setWindowTitle(QStringLiteral("Welcome"));
+	welcomeDock->setWidget(new SymStudioWelcomeDock(this));
+	addDockWidget(Qt::RightDockWidgetArea, welcomeDock);
+	welcomeDock->setFloating(true);
+	welcomeDock->resize(320, 480);
 
 	copyActionsDynamicProperties();
 
