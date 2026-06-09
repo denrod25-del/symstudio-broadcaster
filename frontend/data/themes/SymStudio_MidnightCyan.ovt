@@ -1,0 +1,27 @@
+@OBSThemeMeta {
+    name: 'Midnight Cyan';
+    id: 'com.symstudio.MidnightCyan';
+    extends: 'com.obsproject.Yami';
+    author: 'SymStudio';
+    dark: 'true';
+}
+
+@OBSThemeVars {
+    /* Navy-charcoal surface ramp (overrides Yami greys) */
+    --grey1: #3A4A66;
+    --grey2: #313F58;
+    --grey3: #2A3650;
+    --grey4: #232E44;
+    --grey5: #1C2538;
+    --grey6: #161B27;   /* bg_base / surface */
+    --grey7: #11151F;   /* bg_window */
+    --grey8: #0A0C12;   /* bg_preview (canvas) */
+
+    /* Cyan accent family (overrides Yami blues -> drives --primary*) */
+    --blue1: #7DF8FF;   /* primary_lighter / highlight */
+    --blue2: #33F4FF;   /* primary_light */
+    --blue3: #00C8E6;   /* primary */
+    --blue4: #00A6C2;   /* primary_dark */
+    --blue5: #00788C;   /* primary_darker */
+    --blue6: #045463;
+}
