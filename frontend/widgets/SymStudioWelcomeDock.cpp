@@ -24,6 +24,9 @@ SymStudioWelcomeDock::SymStudioWelcomeDock(OBSBasic *main_, QWidget *parent) : Q
 		QPushButton *b = new QPushButton(text, this);
 		b->setMinimumHeight(40);
 		b->setCursor(Qt::PointingHandCursor);
+		b->setStyleSheet(QStringLiteral(
+			"QPushButton{background:#1b1b2e;border:1px solid #00838f;border-radius:6px;"
+			"padding:6px;color:#e6f7ff;} QPushButton:hover{border-color:#00E5FF;background:#222338;}"));
 		layout->addWidget(b);
 		return b;
 	};
@@ -52,6 +55,17 @@ SymStudioWelcomeDock::SymStudioWelcomeDock(OBSBasic *main_, QWidget *parent) : Q
 	chkKey = makeCheck(QStringLiteral("Add your stream key"));
 	chkLive = makeCheck(QStringLiteral("Go live!"));
 
+	tipLabel = new QLabel(this);
+	tipLabel->setWordWrap(true);
+	tipLabel->setStyleSheet(QStringLiteral("color:#A0A8B4;font-style:italic;margin-top:8px;"));
+	layout->addWidget(tipLabel);
+
+	QPushButton *nextTipBtn = new QPushButton(QStringLiteral("Next tip"), this);
+	nextTipBtn->setFlat(true);
+	nextTipBtn->setCursor(Qt::PointingHandCursor);
+	connect(nextTipBtn, &QPushButton::clicked, this, &SymStudioWelcomeDock::nextTip);
+	layout->addWidget(nextTipBtn);
+
 	layout->addStretch(1);
 	setLayout(layout);
 
@@ -60,6 +74,7 @@ SymStudioWelcomeDock::SymStudioWelcomeDock(OBSBasic *main_, QWidget *parent) : Q
 	connect(refreshTimer, &QTimer::timeout, this, &SymStudioWelcomeDock::refresh);
 	refreshTimer->start();
 	refresh();
+	nextTip();
 }
 
 void SymStudioWelcomeDock::onAddSource()
@@ -157,4 +172,18 @@ void SymStudioWelcomeDock::refresh()
 	setCheck(chkAudio, QStringLiteral("Set up audio"), anyAudioSourceExists());
 	setCheck(chkKey, QStringLiteral("Add your stream key"), streamKeySet());
 	setCheck(chkLive, QStringLiteral("Go live!"), wentLive || streaming);
+}
+
+void SymStudioWelcomeDock::nextTip()
+{
+	static const char *tips[] = {
+		"Tip: Click the + under Sources to add your webcam, screen, or game.",
+		"Tip: Studio Mode (top-right) lets you preview a scene before going live.",
+		"Tip: Right-click a source, then Filters to add a chroma key or color correction.",
+		"Tip: Set your stream key in Settings, Stream before going live.",
+		"Tip: Use scenes to switch layouts - intro, gameplay, 'be right back'.",
+	};
+	const int count = int(sizeof(tips) / sizeof(tips[0]));
+	tipLabel->setText(QString::fromUtf8(tips[tipIndex % count]));
+	tipIndex++;
 }

@@ -71,3 +71,7 @@ unchanged, so settings/profiles are preserved.
 
 SymStudio is based on OBS Studio and distributed under the GNU GPL v2. See the bundled GPLv2
 license text (Help → About → License) and the `AUTHORS` file for OBS contributors.
+
+## Custom features
+- **Welcome dock** — a guided Quick-Start dock (frontend/widgets/SymStudioWelcomeDock.*) with quick-action buttons (Add Source, Stream, Record, Settings), an auto-detecting setup checklist, and rotating tips. Toggle from the Docks menu.
+

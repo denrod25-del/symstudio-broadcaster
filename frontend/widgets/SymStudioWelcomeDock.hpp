@@ -20,6 +20,7 @@ private slots:
 	void onToggleRecord();
 	void onOpenSettings();
 	void refresh();
+	void nextTip();
 
 private:
 	OBSBasic *main = nullptr;
@@ -31,4 +32,6 @@ private:
 	QLabel *chkKey = nullptr;
 	QLabel *chkLive = nullptr;
 	bool wentLive = false;
+	QLabel *tipLabel = nullptr;
+	int tipIndex = 0;
 };
