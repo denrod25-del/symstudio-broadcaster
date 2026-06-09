@@ -26,4 +26,9 @@ private:
 	QPushButton *streamBtn = nullptr;
 	QPushButton *recordBtn = nullptr;
 	QTimer *refreshTimer = nullptr;
+	QLabel *chkSource = nullptr;
+	QLabel *chkAudio = nullptr;
+	QLabel *chkKey = nullptr;
+	QLabel *chkLive = nullptr;
+	bool wentLive = false;
 };
