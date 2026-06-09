@@ -75,3 +75,5 @@ license text (Help → About → License) and the `AUTHORS` file for OBS contrib
 ## Custom features
 - **Welcome dock** — a guided Quick-Start dock (frontend/widgets/SymStudioWelcomeDock.*) with quick-action buttons (Add Source, Stream, Record, Settings), an auto-detecting setup checklist, and rotating tips. Toggle from the Docks menu.
 
+- **Midnight Cyan theme** — SymStudio's default dark theme (frontend/data/themes/SymStudio_MidnightCyan.ovt), a glossy 3D Yami variant: navy surfaces, cyan accent, gradient/bevel depth, Bahnschrift headings. Switch themes in Settings -> Appearance.
+

@@ -25,3 +25,76 @@
     --blue5: #00788C;   /* primary_darker */
     --blue6: #045463;
 }
+
+/* --- 3D glossy buttons --- */
+QPushButton {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #2A3346, stop:0.48 #1E2738, stop:0.5 #1A2230, stop:1 #141A26);
+    border: 1px solid #0C0F16;
+    border-top: 1px solid #3A4D6A;
+    border-radius: 6px;
+    color: #E6F0F5;
+    padding: 5px 12px;
+}
+QPushButton:hover {
+    border: 1px solid #00E5FF;
+    border-top: 1px solid #7DF8FF;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #303B52, stop:0.5 #202A3C, stop:1 #18202E);
+}
+QPushButton:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #141A26, stop:1 #1E2738);
+    border-top: 1px solid #0C0F16;
+}
+QPushButton:disabled {
+    color: #5A6273;
+    background: #161B27;
+    border: 1px solid #11151F;
+}
+
+/* --- inset slider groove + raised handle --- */
+QSlider::groove:horizontal {
+    height: 6px;
+    border-radius: 3px;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #090B10, stop:1 #1A2230);
+}
+QSlider::sub-page:horizontal {
+    border-radius: 3px;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #00788C, stop:1 #33F4FF);
+}
+QSlider::handle:horizontal {
+    width: 16px; margin: -6px 0; border-radius: 8px;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #FFFFFF, stop:1 #B9C6D2);
+    border: 1px solid #6E7E8E;
+}
+QSlider::handle:horizontal:hover { border: 1px solid #00E5FF; }
+
+/* --- raised rounded scrollbar thumbs --- */
+QScrollBar:vertical { background: #0E121B; width: 12px; margin: 0; }
+QScrollBar::handle:vertical {
+    min-height: 24px; border-radius: 5px; margin: 2px;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #2A3346, stop:1 #1A2230);
+    border: 1px solid #0C0F16; border-left: 1px solid #3A4D6A;
+}
+QScrollBar::handle:vertical:hover { border: 1px solid #00C8E6; }
+QScrollBar::add-line, QScrollBar::sub-line { height: 0; width: 0; }
+
+/* --- beveled list/tree selection --- */
+QListView::item:selected, QTreeView::item:selected {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #26344A, stop:1 #1A2230);
+    border-left: 2px solid #00E5FF;
+    color: #FFFFFF;
+}
+
+/* --- distinctive headings/buttons font; body stays system sans --- */
+QPushButton, QGroupBox::title, QTabBar::tab, QDockWidget::title {
+    font-family: "Bahnschrift SemiBold", "Bahnschrift", "Segoe UI Semibold", sans-serif;
+}
+QDockWidget::title {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #1C2334, stop:1 #141A26);
+    border-bottom: 1px solid #0A0C12;
+    padding: 4px 8px;
+    color: #C2C9D6;
+}
+
