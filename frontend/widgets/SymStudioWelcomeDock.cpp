@@ -278,4 +278,43 @@ void SymStudioWelcomeDock::buildStarterScenes()
 		obs_source_release(count);
 	}
 	obs_scene_release(starting);
+
+	/* --- Live --- */
+	obs_scene_t *live = obs_scene_create("Live");
+	/* display capture at the bottom of the stack */
+	obs_source_t *display = obs_source_create("monitor_capture", "Display Capture", nullptr, nullptr);
+	if (display) {
+		obs_scene_add(live, display);
+		obs_source_release(display);
+	}
+	obs_sceneitem_t *bar = addImageToScene(live, "Info Bar", overlayPath("info-bar.png"));
+	if (bar) {
+		vec2 pos = {0.0f, 0.0f};
+		obs_sceneitem_set_pos(bar, &pos);
+	}
+	obs_sceneitem_t *frame = addImageToScene(live, "Webcam Frame", overlayPath("webcam-frame.png"));
+	if (frame) {
+		vec2 pos = {60.0f, 620.0f};
+		obs_sceneitem_set_pos(frame, &pos);
+	}
+	obs_scene_release(live);
+
+	/* --- Be Right Back --- */
+	obs_scene_t *brb = obs_scene_create("Be Right Back");
+	addImageToScene(brb, "BRB Backdrop", overlayPath("bg-brb.png"));
+	obs_scene_release(brb);
+
+	/* --- Ending --- */
+	obs_scene_t *ending = obs_scene_create("Ending");
+	addImageToScene(ending, "Ending Backdrop", overlayPath("bg-ending.png"));
+	obs_scene_release(ending);
+
+	/* land the user on Starting Soon */
+	obs_source_t *startingSrc = obs_get_source_by_name("Starting Soon");
+	if (startingSrc) {
+		obs_frontend_set_current_scene(startingSrc);
+		obs_source_release(startingSrc);
+	}
+
+	obs_frontend_save();
 }
