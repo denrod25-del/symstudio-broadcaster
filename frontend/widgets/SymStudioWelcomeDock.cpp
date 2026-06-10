@@ -188,6 +188,7 @@ void SymStudioWelcomeDock::nextTip()
 		"Tip: Right-click a source, then Filters to add a chroma key or color correction.",
 		"Tip: Set your stream key in Settings, Stream before going live.",
 		"Tip: Use scenes to switch layouts - intro, gameplay, 'be right back'.",
+		"Tip: Make the Starting Soon countdown tick - Tools > Scripts > + > countdown.lua, set Text Source to 'Countdown'.",
 	};
 	const int count = int(sizeof(tips) / sizeof(tips[0]));
 	tipLabel->setText(QString::fromUtf8(tips[tipIndex % count]));

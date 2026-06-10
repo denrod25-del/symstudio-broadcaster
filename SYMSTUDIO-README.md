@@ -77,3 +77,5 @@ license text (Help → About → License) and the `AUTHORS` file for OBS contrib
 
 - **Midnight Cyan theme** — SymStudio's default dark theme (frontend/data/themes/SymStudio_MidnightCyan.ovt), a glossy 3D Yami variant: navy surfaces, cyan accent, gradient/bevel depth, Bahnschrift headings. Switch themes in Settings -> Appearance.
 
+- **Starter scenes** — one click in the Welcome dock ("Install Starter Scenes") creates the "SymStudio Starter" collection: Starting Soon (countdown text; make it tick via Tools > Scripts > countdown.lua with Text Source 'Countdown'), Live (display capture + styled info bar/webcam frame), Be Right Back, and Ending — all in the Midnight Cyan style. Overlay art ships in data/obs-studio/symstudio-overlays/ (regenerable via assets/make-overlays.py).
+
