@@ -9,6 +9,10 @@
 
 #include <obs.h>
 #include <obs-frontend-api.h>
+#include <util/bmem.h>
+#include <utility/platform.hpp>
+#include <cstring>
+#include <string>
 
 SymStudioWelcomeDock::SymStudioWelcomeDock(OBSBasic *main_, QWidget *parent) : QWidget(parent), main(main_)
 {
@@ -40,6 +44,8 @@ SymStudioWelcomeDock::SymStudioWelcomeDock(OBSBasic *main_, QWidget *parent) : Q
 	connect(streamBtn, &QPushButton::clicked, this, &SymStudioWelcomeDock::onToggleStream);
 	connect(recordBtn, &QPushButton::clicked, this, &SymStudioWelcomeDock::onToggleRecord);
 	connect(settingsBtn, &QPushButton::clicked, this, &SymStudioWelcomeDock::onOpenSettings);
+	QPushButton *starterBtn = makeButton(QStringLiteral("Install Starter Scenes"));
+	connect(starterBtn, &QPushButton::clicked, this, &SymStudioWelcomeDock::onInstallStarterScenes);
 
 	QLabel *chkHeader = new QLabel(QStringLiteral("Setup checklist"), this);
 	chkHeader->setStyleSheet(QStringLiteral("font-weight:bold;margin-top:8px;"));
@@ -186,4 +192,90 @@ void SymStudioWelcomeDock::nextTip()
 	const int count = int(sizeof(tips) / sizeof(tips[0]));
 	tipLabel->setText(QString::fromUtf8(tips[tipIndex % count]));
 	tipIndex++;
+}
+
+static const char *kStarterCollection = "SymStudio Starter";
+
+namespace {
+
+std::string overlayPath(const char *file)
+{
+	std::string path;
+	if (!GetDataFilePath((std::string("symstudio-overlays/") + file).c_str(), path))
+		return std::string();
+	return path;
+}
+
+obs_source_t *createTextSource(const char *name, const char *text, int size)
+{
+	obs_data_t *s = obs_data_create();
+	obs_data_t *fontObj = obs_data_create();
+	obs_data_set_string(fontObj, "face", "Bahnschrift");
+	obs_data_set_int(fontObj, "size", size);
+	obs_data_set_obj(s, "font", fontObj);
+	obs_data_release(fontObj);
+	obs_data_set_string(s, "text", text);
+	obs_source_t *src = obs_source_create("text_gdiplus_v3", name, s, nullptr);
+	if (!src)
+		src = obs_source_create("text_gdiplus", name, s, nullptr);
+	obs_data_release(s);
+	return src;
+}
+
+obs_sceneitem_t *addImageToScene(obs_scene_t *scene, const char *name, const std::string &file)
+{
+	if (file.empty())
+		return nullptr;
+	obs_data_t *s = obs_data_create();
+	obs_data_set_string(s, "file", file.c_str());
+	obs_source_t *src = obs_source_create("image_source", name, s, nullptr);
+	obs_data_release(s);
+	if (!src)
+		return nullptr;
+	obs_sceneitem_t *item = obs_scene_add(scene, src);
+	obs_source_release(src);
+	return item;
+}
+
+} // namespace
+
+void SymStudioWelcomeDock::onInstallStarterScenes()
+{
+	/* If the collection exists, just switch to it. */
+	char **collections = obs_frontend_get_scene_collections();
+	bool exists = false;
+	for (char **c = collections; c && *c; c++) {
+		if (strcmp(*c, kStarterCollection) == 0)
+			exists = true;
+		bfree(*c);
+	}
+	bfree(collections);
+
+	if (exists) {
+		obs_frontend_set_current_scene_collection(kStarterCollection);
+		return;
+	}
+
+	if (!obs_frontend_add_scene_collection(kStarterCollection))
+		return;
+
+	/* Defer scene building one event-loop turn so the collection switch settles. */
+	QTimer::singleShot(0, this, &SymStudioWelcomeDock::buildStarterScenes);
+}
+
+void SymStudioWelcomeDock::buildStarterScenes()
+{
+	/* --- Starting Soon --- */
+	obs_scene_t *starting = obs_scene_create("Starting Soon");
+	addImageToScene(starting, "Starting Soon Backdrop", overlayPath("bg-starting-soon.png"));
+	obs_source_t *count = createTextSource("Countdown", "05:00", 96);
+	if (count) {
+		obs_sceneitem_t *item = obs_scene_add(starting, count);
+		if (item) {
+			vec2 pos = {810.0f, 760.0f};
+			obs_sceneitem_set_pos(item, &pos);
+		}
+		obs_source_release(count);
+	}
+	obs_scene_release(starting);
 }

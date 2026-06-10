@@ -21,8 +21,10 @@ private slots:
 	void onOpenSettings();
 	void refresh();
 	void nextTip();
+	void onInstallStarterScenes();
 
 private:
+	void buildStarterScenes();
 	OBSBasic *main = nullptr;
 	QPushButton *streamBtn = nullptr;
 	QPushButton *recordBtn = nullptr;
