@@ -79,3 +79,5 @@ license text (Help → About → License) and the `AUTHORS` file for OBS contrib
 
 - **Starter scenes** — one click in the Welcome dock ("Install Starter Scenes") creates the "SymStudio Starter" collection: Starting Soon (countdown text; make it tick via Tools > Scripts > countdown.lua with Text Source 'Countdown'), Live (display capture + styled info bar/webcam frame), Be Right Back, and Ending — all in the Midnight Cyan style. Overlay art ships in data/obs-studio/symstudio-overlays/ (regenerable via assets/make-overlays.py).
 
+- **Twitch chat dock** — a built-in "Chat" dock (frontend/widgets/SymStudioChatDock.*) that connects anonymously (read-only) to Twitch IRC over QTcpSocket. Type a channel, Connect, and watch live chat with colored names. No login required. (Read-only; sending/emotes are future work.)
+

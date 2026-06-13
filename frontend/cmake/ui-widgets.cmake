@@ -61,4 +61,6 @@ target_sources(
     widgets/StatusBarWidget.hpp
     widgets/SymStudioWelcomeDock.cpp
     widgets/SymStudioWelcomeDock.hpp
+    widgets/SymStudioChatDock.cpp
+    widgets/SymStudioChatDock.hpp
 )

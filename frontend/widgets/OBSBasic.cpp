@@ -32,6 +32,7 @@
 #endif
 #include <docks/OBSDock.hpp>
 #include "SymStudioWelcomeDock.hpp"
+#include "SymStudioChatDock.hpp"
 #include <dialogs/NameDialog.hpp>
 #include <dialogs/OBSAbout.hpp>
 #include <dialogs/OBSBasicAdvAudio.hpp>
@@ -378,6 +379,16 @@ OBSBasic::OBSBasic(QWidget *parent) : OBSMainWindow(parent), undo_s(ui), ui(new 
 	/* Dock it to the side rather than floating — a floating dock gets pushed
 	 * behind the main window on startup and is hard to find. */
 	welcomeDock->setFloating(false);
+
+	/* --- SymStudio Chat dock --- */
+	OBSDock *chatDock = new OBSDock();
+	chatDock->setObjectName(QStringLiteral("symStudioChatDock"));
+	chatDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable |
+			      QDockWidget::DockWidgetFloatable);
+	chatDock->setWindowTitle(QStringLiteral("Chat"));
+	chatDock->setWidget(new SymStudioChatDock());
+	addDockWidget(Qt::RightDockWidgetArea, chatDock);
+	chatDock->setFloating(false);
 
 	copyActionsDynamicProperties();
 
