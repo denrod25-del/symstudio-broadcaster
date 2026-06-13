@@ -375,8 +375,9 @@ OBSBasic::OBSBasic(QWidget *parent) : OBSMainWindow(parent), undo_s(ui), ui(new 
 	welcomeDock->setWindowTitle(QStringLiteral("Welcome"));
 	welcomeDock->setWidget(new SymStudioWelcomeDock(this));
 	addDockWidget(Qt::RightDockWidgetArea, welcomeDock);
-	welcomeDock->setFloating(true);
-	welcomeDock->resize(320, 480);
+	/* Dock it to the side rather than floating — a floating dock gets pushed
+	 * behind the main window on startup and is hard to find. */
+	welcomeDock->setFloating(false);
 
 	copyActionsDynamicProperties();
 
