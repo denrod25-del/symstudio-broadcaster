@@ -17,6 +17,9 @@ public:
 	explicit SymStudioSymbolicDock(QWidget *parent = nullptr);
 	~SymStudioSymbolicDock() override;
 
+protected:
+	bool eventFilter(QObject *obj, QEvent *e) override;
+
 private slots:
 	void onLaunchClicked();
 	void onPollTick();
@@ -32,7 +35,7 @@ private:
 	QPushButton *launchBtn = nullptr;
 	QLabel *statusLabel = nullptr;
 	QVBoxLayout *root = nullptr;
-	QWidget *container = nullptr;
+	QWidget *host = nullptr;
 	QTimer *pollTimer = nullptr;
 
 	QString exePath;

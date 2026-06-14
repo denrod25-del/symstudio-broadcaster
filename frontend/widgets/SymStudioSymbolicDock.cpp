@@ -9,7 +9,7 @@
 #include <QTimer>
 #include <QProcess>
 #include <QFileInfo>
-#include <QWindow>
+#include <QEvent>
 
 #include <util/config-file.h>
 
@@ -76,7 +76,12 @@ SymStudioSymbolicDock::SymStudioSymbolicDock(QWidget *parent) : QWidget(parent)
 	statusLabel->setStyleSheet(QStringLiteral("color:#7E8796;font-size:11px;"));
 	root->addWidget(statusLabel);
 
-	root->addStretch(1);
+	host = new QWidget(this);
+	host->setAttribute(Qt::WA_NativeWindow);
+	host->setMinimumSize(200, 150);
+	host->installEventFilter(this);
+	root->addWidget(host, 1);
+
 	setLayout(root);
 
 	connect(launchBtn, &QPushButton::clicked, this, &SymStudioSymbolicDock::onLaunchClicked);
@@ -147,12 +152,25 @@ void SymStudioSymbolicDock::embed()
 	SetWindowLongPtrW(hwnd, GWL_STYLE, s);
 	SetWindowPos(hwnd, nullptr, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
-	QWindow *foreign = QWindow::fromWinId(reinterpret_cast<WId>(hwnd));
-	container = QWidget::createWindowContainer(foreign, this);
-	container->setMinimumSize(200, 150);
-	root->insertWidget(root->count() - 1, container, 1); // before the trailing stretch
+	/* manual reparent into the native host widget — Windows routes input to the
+	 * child natively (fixes clicks/typing) and we control geometry ourselves. */
+	SetParent(hwnd, reinterpret_cast<HWND>(host->winId()));
+	MoveWindow(hwnd, 0, 0, host->width(), host->height(), TRUE);
+	ShowWindow(hwnd, SW_SHOW);
+	SetFocus(hwnd);
 	setStatus(QStringLiteral("Embedded."));
 #endif
+}
+
+bool SymStudioSymbolicDock::eventFilter(QObject *obj, QEvent *e)
+{
+#ifdef _WIN32
+	if (obj == host && e->type() == QEvent::Resize && embeddedHwnd) {
+		HWND hwnd = reinterpret_cast<HWND>(embeddedHwnd);
+		MoveWindow(hwnd, 0, 0, host->width(), host->height(), TRUE);
+	}
+#endif
+	return QWidget::eventFilter(obj, e);
 }
 
 void SymStudioSymbolicDock::detach()
@@ -167,10 +185,6 @@ void SymStudioSymbolicDock::detach()
 		embeddedHwnd = nullptr;
 	}
 #endif
-	if (container) {
-		container->deleteLater();
-		container = nullptr;
-	}
 }
 
 void SymStudioSymbolicDock::onLaunchClicked()
