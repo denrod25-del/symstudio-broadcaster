@@ -33,6 +33,7 @@
 #include <docks/OBSDock.hpp>
 #include "SymStudioWelcomeDock.hpp"
 #include "SymStudioChatDock.hpp"
+#include "SymStudioStreamDock.hpp"
 #include <dialogs/NameDialog.hpp>
 #include <dialogs/OBSAbout.hpp>
 #include <dialogs/OBSBasicAdvAudio.hpp>
@@ -389,6 +390,16 @@ OBSBasic::OBSBasic(QWidget *parent) : OBSMainWindow(parent), undo_s(ui), ui(new 
 	chatDock->setWidget(new SymStudioChatDock());
 	addDockWidget(Qt::RightDockWidgetArea, chatDock);
 	chatDock->setFloating(false);
+
+	/* --- SymStudio Stream Info dock --- */
+	OBSDock *streamDock = new OBSDock();
+	streamDock->setObjectName(QStringLiteral("symStudioStreamDock"));
+	streamDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable |
+				QDockWidget::DockWidgetFloatable);
+	streamDock->setWindowTitle(QStringLiteral("Stream Info"));
+	streamDock->setWidget(new SymStudioStreamDock());
+	addDockWidget(Qt::RightDockWidgetArea, streamDock);
+	streamDock->setFloating(false);
 
 	copyActionsDynamicProperties();
 

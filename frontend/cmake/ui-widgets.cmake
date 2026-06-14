@@ -63,4 +63,6 @@ target_sources(
     widgets/SymStudioWelcomeDock.hpp
     widgets/SymStudioChatDock.cpp
     widgets/SymStudioChatDock.hpp
+    widgets/SymStudioStreamDock.cpp
+    widgets/SymStudioStreamDock.hpp
 )

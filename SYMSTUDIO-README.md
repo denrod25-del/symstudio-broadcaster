@@ -81,3 +81,5 @@ license text (Help → About → License) and the `AUTHORS` file for OBS contrib
 
 - **Twitch chat dock** — a built-in "Chat" dock (frontend/widgets/SymStudioChatDock.*) that connects anonymously (read-only) to Twitch IRC over QTcpSocket. Type a channel, Connect, and watch live chat with colored names. No login required. (Read-only; sending/emotes are future work.)
 
+- **Stream Info dock** — update your Twitch stream title + category from inside SymStudio (frontend/widgets/SymStudioStreamDock.*). One-time setup: register a Twitch app at dev.twitch.tv (enable OAuth Device Code Grant), paste the Client ID, Login (device-code flow, no secret). Uses Helix PATCH /channels. Tokens stored in config.
+
