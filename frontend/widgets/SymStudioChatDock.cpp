@@ -54,6 +54,17 @@ SymStudioChatDock::SymStudioChatDock(QWidget *parent) : QWidget(parent)
 		channelEdit->setText(QString::fromUtf8(saved));
 }
 
+SymStudioChatDock::~SymStudioChatDock()
+{
+	// On shutdown the socket is destroyed as a child of this dock, which emits
+	// disconnected() and would invoke onSocketDisconnected() against an
+	// already-torn-down widget tree (crash). Sever the connections first.
+	if (socket) {
+		socket->disconnect(this);
+		socket->abort();
+	}
+}
+
 void SymStudioChatDock::setConnectedState(bool on)
 {
 	connected = on;

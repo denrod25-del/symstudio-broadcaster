@@ -16,6 +16,7 @@ class SymStudioChatDock : public QWidget {
 
 public:
 	explicit SymStudioChatDock(QWidget *parent = nullptr);
+	~SymStudioChatDock() override;
 
 private slots:
 	void onConnectClicked();

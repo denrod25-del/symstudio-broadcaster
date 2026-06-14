@@ -19,6 +19,7 @@ class SymStudioAlertsDock : public QWidget {
 
 public:
 	explicit SymStudioAlertsDock(QWidget *parent = nullptr);
+	~SymStudioAlertsDock() override;
 
 private slots:
 	void onConnectClicked();

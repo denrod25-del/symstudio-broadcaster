@@ -132,6 +132,16 @@ SymStudioAlertsDock::SymStudioAlertsDock(QWidget *parent) : QWidget(parent)
 	});
 }
 
+SymStudioAlertsDock::~SymStudioAlertsDock()
+{
+	// Prevent the socket's disconnected() signal from invoking our slot against
+	// an already-torn-down widget tree during shutdown (see ChatDock crash).
+	if (socket) {
+		socket->disconnect(this);
+		socket->abort();
+	}
+}
+
 void SymStudioAlertsDock::setConnectedState(bool on)
 {
 	connected = on;
