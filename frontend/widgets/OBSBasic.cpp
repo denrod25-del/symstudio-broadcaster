@@ -34,6 +34,7 @@
 #include "SymStudioWelcomeDock.hpp"
 #include "SymStudioChatDock.hpp"
 #include "SymStudioStreamDock.hpp"
+#include "SymStudioAlertsDock.hpp"
 #include <dialogs/NameDialog.hpp>
 #include <dialogs/OBSAbout.hpp>
 #include <dialogs/OBSBasicAdvAudio.hpp>
@@ -400,6 +401,16 @@ OBSBasic::OBSBasic(QWidget *parent) : OBSMainWindow(parent), undo_s(ui), ui(new 
 	streamDock->setWidget(new SymStudioStreamDock());
 	addDockWidget(Qt::RightDockWidgetArea, streamDock);
 	streamDock->setFloating(false);
+
+	/* --- SymStudio Alerts dock --- */
+	OBSDock *alertsDock = new OBSDock();
+	alertsDock->setObjectName(QStringLiteral("symStudioAlertsDock"));
+	alertsDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable |
+				QDockWidget::DockWidgetFloatable);
+	alertsDock->setWindowTitle(QStringLiteral("Alerts"));
+	alertsDock->setWidget(new SymStudioAlertsDock());
+	addDockWidget(Qt::RightDockWidgetArea, alertsDock);
+	alertsDock->setFloating(false);
 
 	copyActionsDynamicProperties();
 
