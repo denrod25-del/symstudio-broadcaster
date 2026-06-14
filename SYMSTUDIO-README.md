@@ -83,3 +83,5 @@ license text (Help → About → License) and the `AUTHORS` file for OBS contrib
 
 - **Stream Info dock** — update your Twitch stream title + category from inside SymStudio (frontend/widgets/SymStudioStreamDock.*). One-time setup: register a Twitch app at dev.twitch.tv (enable OAuth Device Code Grant), paste the Client ID, Login (device-code flow, no secret). Uses Helix PATCH /channels. Tokens stored in config.
 
+- **Alerts dock** — on-stream Twitch alerts for subs/resubs/gift subs/raids/cheers, detected over anonymous IRC (no login). Connect to your channel; alerts show in the dock feed and (toggle) on-canvas via a "SymStudio Alert" text source (place it in your scene). "Test alert" verifies the pipeline. (Follows + animated/sound overlays are future work.)
+
