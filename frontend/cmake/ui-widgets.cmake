@@ -69,4 +69,6 @@ target_sources(
     widgets/SymStudioAlertsDock.hpp
     widgets/SymStudioSymbolicDock.cpp
     widgets/SymStudioSymbolicDock.hpp
+    widgets/SymStudioTrackerDock.cpp
+    widgets/SymStudioTrackerDock.hpp
 )

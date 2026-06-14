@@ -36,6 +36,7 @@
 #include "SymStudioStreamDock.hpp"
 #include "SymStudioAlertsDock.hpp"
 #include "SymStudioSymbolicDock.hpp"
+#include "SymStudioTrackerDock.hpp"
 #include <dialogs/NameDialog.hpp>
 #include <dialogs/OBSAbout.hpp>
 #include <dialogs/OBSBasicAdvAudio.hpp>
@@ -422,6 +423,16 @@ OBSBasic::OBSBasic(QWidget *parent) : OBSMainWindow(parent), undo_s(ui), ui(new 
 	symbolicDock->setWidget(new SymStudioSymbolicDock());
 	addDockWidget(Qt::RightDockWidgetArea, symbolicDock);
 	symbolicDock->setFloating(false);
+
+	/* --- SymStudio Stream Tracker dock --- */
+	OBSDock *trackerDock = new OBSDock();
+	trackerDock->setObjectName(QStringLiteral("symStudioTrackerDock"));
+	trackerDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable |
+				 QDockWidget::DockWidgetFloatable);
+	trackerDock->setWindowTitle(QStringLiteral("Stream Tracker"));
+	trackerDock->setWidget(new SymStudioTrackerDock());
+	addDockWidget(Qt::RightDockWidgetArea, trackerDock);
+	trackerDock->setFloating(false);
 
 	copyActionsDynamicProperties();
 

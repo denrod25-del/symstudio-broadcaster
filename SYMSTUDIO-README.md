@@ -89,3 +89,5 @@ license text (Help → About → License) and the `AUTHORS` file for OBS contrib
 
 - **Symbolic dock** — embeds the Symbolic desktop browser inside SymStudio (Windows-only, frontend/widgets/SymStudioSymbolicDock.*). Launch && Embed reparents Symbolic's window into the dock (frame stripped); the button also re-attaches if it detaches; closing the dock returns Symbolic to a normal window. Experimental (external-process window embedding); path editable.
 
+- **Stream Tracker dock** — a live multi-channel Twitch dashboard (frontend/widgets/SymStudioTrackerDock.*). Add a watchlist; tiles show live/offline, viewer count with up/down delta, game, title, uptime, and a thumbnail, auto-refreshing every 45s via Helix /streams. Reuses your Stream Info login (log in there first). Live-video tiles are future work.
+
