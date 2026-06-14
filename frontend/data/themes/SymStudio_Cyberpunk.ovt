@@ -97,3 +97,13 @@ QDockWidget::title {
     padding: 4px 8px;
     color: #C2C9D6;
 }
+
+/* --- deep cyberpunk black for the main window backdrop / empty areas --- */
+QMainWindow {
+    background-color: #07090F;
+}
+QMainWindow::separator {
+    background: #06080E;
+    width: 3px;
+    height: 3px;
+}

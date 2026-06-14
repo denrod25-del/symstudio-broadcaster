@@ -85,3 +85,5 @@ license text (Help → About → License) and the `AUTHORS` file for OBS contrib
 
 - **Alerts dock** — on-stream Twitch alerts for subs/resubs/gift subs/raids/cheers, detected over anonymous IRC (no login). Connect to your channel; alerts show in the dock feed and (toggle) on-canvas via a "SymStudio Alert" text source (place it in your scene). "Test alert" verifies the pipeline. (Follows + animated/sound overlays are future work.)
 
+- **Cyberpunk theme** — SymStudio's default dark theme (frontend/data/themes/SymStudio_Cyberpunk.ovt): navy-black surfaces with a neon cyan x magenta cyberpunk duo (magenta hover/accents, cyan->magenta slider, deep-black window backdrop), glossy gradient/bevel, Bahnschrift headings. Midnight Cyan and Yami remain selectable in Settings -> Appearance.
+
