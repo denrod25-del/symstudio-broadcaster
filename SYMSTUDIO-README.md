@@ -87,3 +87,5 @@ license text (Help → About → License) and the `AUTHORS` file for OBS contrib
 
 - **Cyberpunk theme** — SymStudio's default dark theme (frontend/data/themes/SymStudio_Cyberpunk.ovt): navy-black surfaces with a neon cyan x magenta cyberpunk duo (magenta hover/accents, cyan->magenta slider, deep-black window backdrop), glossy gradient/bevel, Bahnschrift headings. Midnight Cyan and Yami remain selectable in Settings -> Appearance.
 
+- **Symbolic dock** — embeds the Symbolic desktop browser inside SymStudio (Windows-only, frontend/widgets/SymStudioSymbolicDock.*). Launch && Embed reparents Symbolic's window into the dock (frame stripped); the button also re-attaches if it detaches; closing the dock returns Symbolic to a normal window. Experimental (external-process window embedding); path editable.
+
