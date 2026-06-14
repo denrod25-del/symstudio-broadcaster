@@ -1,0 +1,99 @@
+@OBSThemeMeta {
+    name: 'Cyberpunk';
+    id: 'com.symstudio.Cyberpunk';
+    extends: 'com.obsproject.Yami';
+    author: 'SymStudio';
+    dark: 'true';
+}
+
+@OBSThemeVars {
+    /* Navy-black surface ramp (deeper/higher-contrast than Midnight Cyan) */
+    --grey1: #3A4A6E;
+    --grey2: #2E3C5C;
+    --grey3: #26324C;
+    --grey4: #1E2840;
+    --grey5: #161E30;
+    --grey6: #10141E;   /* bg_base / surface */
+    --grey7: #0A0D14;   /* bg_window */
+    --grey8: #06080E;   /* bg_preview (canvas) */
+
+    /* Cyan accent family (drives Yami --primary*) */
+    --blue1: #7DF8FF;
+    --blue2: #33F4FF;
+    --blue3: #00C8E6;
+    --blue4: #00A6C2;
+    --blue5: #00788C;
+    --blue6: #045463;
+}
+
+/* --- glossy buttons; cyan bevel, MAGENTA neon hover (cyberpunk dual-tone) --- */
+QPushButton {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #1C2740, stop:0.48 #131B2E, stop:0.5 #0F1626, stop:1 #0A0F1C);
+    border: 1px solid #06080E;
+    border-top: 1px solid #2E3E62;
+    border-radius: 6px;
+    color: #E6F0F5;
+    padding: 5px 12px;
+}
+QPushButton:hover {
+    border: 1px solid #FF2D9B;
+    border-top: 1px solid #FF6FBE;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #241830, stop:0.5 #1A1322, stop:1 #120D18);
+}
+QPushButton:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #0A0F1C, stop:1 #131B2E);
+    border-top: 1px solid #06080E;
+}
+QPushButton:disabled {
+    color: #5A6273;
+    background: #10141E;
+    border: 1px solid #0A0D14;
+}
+
+/* --- inset slider; cyan->magenta fill; magenta hover ring --- */
+QSlider::groove:horizontal {
+    height: 6px;
+    border-radius: 3px;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #05070C, stop:1 #161E30);
+}
+QSlider::sub-page:horizontal {
+    border-radius: 3px;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #00E5FF, stop:1 #FF2D9B);
+}
+QSlider::handle:horizontal {
+    width: 16px; margin: -6px 0; border-radius: 8px;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #FFFFFF, stop:1 #B9C6D2);
+    border: 1px solid #6E7E8E;
+}
+QSlider::handle:horizontal:hover { border: 1px solid #FF2D9B; }
+
+/* --- raised rounded scrollbar thumbs; magenta hover --- */
+QScrollBar:vertical { background: #0A0D14; width: 12px; margin: 0; }
+QScrollBar::handle:vertical {
+    min-height: 24px; border-radius: 5px; margin: 2px;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #1C2740, stop:1 #10141E);
+    border: 1px solid #06080E; border-left: 1px solid #2E3E62;
+}
+QScrollBar::handle:vertical:hover { border: 1px solid #FF2D9B; }
+QScrollBar::add-line, QScrollBar::sub-line { height: 0; width: 0; }
+
+/* --- beveled list/tree selection (cyan bar) --- */
+QListView::item:selected, QTreeView::item:selected {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #1C2842, stop:1 #10141E);
+    border-left: 2px solid #00E5FF;
+    color: #FFFFFF;
+}
+
+/* --- Bahnschrift headings; neon cyan dock-title underline --- */
+QPushButton, QGroupBox::title, QTabBar::tab, QDockWidget::title {
+    font-family: "Bahnschrift SemiBold", "Bahnschrift", "Segoe UI Semibold", sans-serif;
+}
+QDockWidget::title {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #141B2C, stop:1 #0A0F1C);
+    border-bottom: 1px solid #00C8E6;
+    padding: 4px 8px;
+    color: #C2C9D6;
+}
