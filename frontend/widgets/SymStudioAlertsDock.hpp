@@ -11,6 +11,7 @@ class QCheckBox;
 class QTextEdit;
 class QTcpSocket;
 class QTimer;
+class SymStudioAlertServer;
 
 // SymStudio Twitch alerts dock — anonymous IRC USERNOTICE/bits -> feed + on-canvas text.
 class SymStudioAlertsDock : public QWidget {
@@ -32,16 +33,20 @@ private:
 	void loadConfig();
 	void saveStr(const char *key, const QString &val);
 	void handleLine(const QString &line);
-	void addAlert(const QString &text);
+	void addAlert(const QString &text, const QString &type = QStringLiteral("alert"));
 	void updateCanvas(const QString &text);
+	void ensureOverlaySource();
 
 	QLineEdit *channelEdit = nullptr;
 	QPushButton *connectBtn = nullptr;
 	QLabel *statusLabel = nullptr;
 	QCheckBox *canvasCheck = nullptr;
+	QCheckBox *overlayCheck = nullptr;
 	QPushButton *testBtn = nullptr;
 	QTextEdit *feed = nullptr;
+	QLabel *overlayInfo = nullptr;
 
+	SymStudioAlertServer *alertServer = nullptr;
 	QTcpSocket *socket = nullptr;
 	QTimer *clearTimer = nullptr;
 	QByteArray rxBuffer;

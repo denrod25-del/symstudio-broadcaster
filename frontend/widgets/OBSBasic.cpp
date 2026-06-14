@@ -383,6 +383,7 @@ OBSBasic::OBSBasic(QWidget *parent) : OBSMainWindow(parent), undo_s(ui), ui(new 
 	/* Dock it to the side rather than floating — a floating dock gets pushed
 	 * behind the main window on startup and is hard to find. */
 	welcomeDock->setFloating(false);
+	ui->menuDocks->addAction(welcomeDock->toggleViewAction());
 
 	/* --- SymStudio Chat dock --- */
 	OBSDock *chatDock = new OBSDock();
@@ -393,6 +394,7 @@ OBSBasic::OBSBasic(QWidget *parent) : OBSMainWindow(parent), undo_s(ui), ui(new 
 	chatDock->setWidget(new SymStudioChatDock());
 	addDockWidget(Qt::RightDockWidgetArea, chatDock);
 	chatDock->setFloating(false);
+	ui->menuDocks->addAction(chatDock->toggleViewAction());
 
 	/* --- SymStudio Stream Info dock --- */
 	OBSDock *streamDock = new OBSDock();
@@ -403,6 +405,7 @@ OBSBasic::OBSBasic(QWidget *parent) : OBSMainWindow(parent), undo_s(ui), ui(new 
 	streamDock->setWidget(new SymStudioStreamDock());
 	addDockWidget(Qt::RightDockWidgetArea, streamDock);
 	streamDock->setFloating(false);
+	ui->menuDocks->addAction(streamDock->toggleViewAction());
 
 	/* --- SymStudio Alerts dock --- */
 	OBSDock *alertsDock = new OBSDock();
@@ -413,6 +416,7 @@ OBSBasic::OBSBasic(QWidget *parent) : OBSMainWindow(parent), undo_s(ui), ui(new 
 	alertsDock->setWidget(new SymStudioAlertsDock());
 	addDockWidget(Qt::RightDockWidgetArea, alertsDock);
 	alertsDock->setFloating(false);
+	ui->menuDocks->addAction(alertsDock->toggleViewAction());
 
 	/* --- SymStudio Symbolic embed dock --- */
 	OBSDock *symbolicDock = new OBSDock();
@@ -423,6 +427,7 @@ OBSBasic::OBSBasic(QWidget *parent) : OBSMainWindow(parent), undo_s(ui), ui(new 
 	symbolicDock->setWidget(new SymStudioSymbolicDock());
 	addDockWidget(Qt::RightDockWidgetArea, symbolicDock);
 	symbolicDock->setFloating(false);
+	ui->menuDocks->addAction(symbolicDock->toggleViewAction());
 
 	/* --- SymStudio Stream Tracker dock --- */
 	OBSDock *trackerDock = new OBSDock();
@@ -433,6 +438,7 @@ OBSBasic::OBSBasic(QWidget *parent) : OBSMainWindow(parent), undo_s(ui), ui(new 
 	trackerDock->setWidget(new SymStudioTrackerDock());
 	addDockWidget(Qt::RightDockWidgetArea, trackerDock);
 	trackerDock->setFloating(false);
+	ui->menuDocks->addAction(trackerDock->toggleViewAction());
 
 	copyActionsDynamicProperties();
 

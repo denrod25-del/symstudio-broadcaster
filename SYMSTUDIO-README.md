@@ -91,3 +91,5 @@ license text (Help → About → License) and the `AUTHORS` file for OBS contrib
 
 - **Stream Tracker dock** — a live multi-channel Twitch dashboard (frontend/widgets/SymStudioTrackerDock.*). Add a watchlist; tiles show live/offline, viewer count with up/down delta, game, title, uptime, and a thumbnail, auto-refreshing every 45s via Helix /streams. Reuses your Stream Info login (log in there first). Live-video tiles are future work.
 
+
+- **Animated alert overlays** — the Alerts dock can also show real animated, sounded alerts on canvas (tick "Animated overlay (browser)"). SymStudio runs a tiny local server (127.0.0.1:28782) serving an HTML/CSS overlay; it auto-adds a "SymStudio Alert Overlay" browser source to your current scene (position it once). Slide-in/pop/fade + a Web-Audio chime, all restyleable in HTML. Independent of the text on-canvas mode.

@@ -1,4 +1,5 @@
 #include "SymStudioAlertsDock.hpp"
+#include "SymStudioAlertServer.hpp"
 #include "OBSApp.hpp"
 
 #include <QLineEdit>
@@ -60,6 +61,9 @@ QHash<QString, QString> parseTags(const QString &tags)
 
 SymStudioAlertsDock::SymStudioAlertsDock(QWidget *parent) : QWidget(parent)
 {
+	alertServer = new SymStudioAlertServer(this);
+	alertServer->start();
+
 	socket = new QTcpSocket(this);
 	connect(socket, &QTcpSocket::connected, this, &SymStudioAlertsDock::onSocketConnected);
 	connect(socket, &QTcpSocket::readyRead, this, &SymStudioAlertsDock::onSocketReadyRead);
@@ -86,11 +90,24 @@ SymStudioAlertsDock::SymStudioAlertsDock(QWidget *parent) : QWidget(parent)
 	root->addWidget(statusLabel);
 
 	QHBoxLayout *ctl = new QHBoxLayout();
-	canvasCheck = new QCheckBox(QStringLiteral("Show alerts on canvas"), this);
+	canvasCheck = new QCheckBox(QStringLiteral("Show alerts on canvas (text)"), this);
 	testBtn = new QPushButton(QStringLiteral("Test alert"), this);
 	ctl->addWidget(canvasCheck, 1);
 	ctl->addWidget(testBtn);
 	root->addLayout(ctl);
+
+	overlayCheck = new QCheckBox(QStringLiteral("Animated overlay (browser)"), this);
+	root->addWidget(overlayCheck);
+
+	overlayInfo = new QLabel(this);
+	overlayInfo->setStyleSheet(QStringLiteral("color:#7E8796;font-size:11px;"));
+	if (alertServer->isListening())
+		overlayInfo->setText(
+			QStringLiteral("Overlay: http://127.0.0.1:%1/  (auto-added as a browser source)")
+				.arg(alertServer->port()));
+	else
+		overlayInfo->setText(QStringLiteral("Overlay: server unavailable (port busy)"));
+	root->addWidget(overlayInfo);
 
 	feed = new QTextEdit(this);
 	feed->setReadOnly(true);
@@ -106,6 +123,11 @@ SymStudioAlertsDock::SymStudioAlertsDock(QWidget *parent) : QWidget(parent)
 
 	connect(canvasCheck, &QCheckBox::toggled, this, [this](bool on) {
 		config_set_bool(App()->GetUserConfig(), "SymStudioAlerts", "ShowOnCanvas", on);
+		config_save_safe(App()->GetUserConfig(), "tmp", nullptr);
+	});
+
+	connect(overlayCheck, &QCheckBox::toggled, this, [this](bool on) {
+		config_set_bool(App()->GetUserConfig(), "SymStudioAlerts", "AnimatedOverlay", on);
 		config_save_safe(App()->GetUserConfig(), "tmp", nullptr);
 	});
 }
@@ -130,6 +152,7 @@ void SymStudioAlertsDock::loadConfig()
 	if (ch && *ch)
 		channelEdit->setText(QString::fromUtf8(ch));
 	canvasCheck->setChecked(config_get_bool(App()->GetUserConfig(), "SymStudioAlerts", "ShowOnCanvas"));
+	overlayCheck->setChecked(config_get_bool(App()->GetUserConfig(), "SymStudioAlerts", "AnimatedOverlay"));
 }
 
 void SymStudioAlertsDock::onConnectClicked()
@@ -207,19 +230,20 @@ void SymStudioAlertsDock::handleLine(const QString &lineIn)
 	if (command == QStringLiteral("USERNOTICE")) {
 		const QString sys = tags.value(QStringLiteral("system-msg"));
 		if (!sys.isEmpty())
-			addAlert(sys);
+			addAlert(sys, tags.value(QStringLiteral("msg-id")));
 	} else if (command == QStringLiteral("PRIVMSG")) {
 		const QString bits = tags.value(QStringLiteral("bits"));
 		if (!bits.isEmpty() && bits != QStringLiteral("0")) {
 			QString name = tags.value(QStringLiteral("display-name"));
 			if (name.isEmpty())
 				name = QStringLiteral("Someone");
-			addAlert(QStringLiteral("%1 cheered %2 bits!").arg(name, bits));
+			addAlert(QStringLiteral("%1 cheered %2 bits!").arg(name, bits),
+				 QStringLiteral("cheer"));
 		}
 	}
 }
 
-void SymStudioAlertsDock::addAlert(const QString &text)
+void SymStudioAlertsDock::addAlert(const QString &text, const QString &type)
 {
 	feed->append(QStringLiteral("<b style='color:#00E5FF'>★</b> %1").arg(text.toHtmlEscaped()));
 	const int maxBlocks = 100;
@@ -233,11 +257,43 @@ void SymStudioAlertsDock::addAlert(const QString &text)
 
 	if (canvasCheck->isChecked())
 		updateCanvas(text);
+
+	if (overlayCheck->isChecked() && alertServer->isListening()) {
+		alertServer->pushAlert(text, type);
+		ensureOverlaySource();
+	}
 }
 
 void SymStudioAlertsDock::onTestClicked()
 {
-	addAlert(QStringLiteral("TestUser just subscribed at Tier 1! (test)"));
+	addAlert(QStringLiteral("TestUser just subscribed at Tier 1! (test)"), QStringLiteral("sub"));
+}
+
+void SymStudioAlertsDock::ensureOverlaySource()
+{
+	const char *kName = "SymStudio Alert Overlay";
+	obs_source_t *src = obs_get_source_by_name(kName);
+	if (!src) {
+		obs_data_t *s = obs_data_create();
+		obs_data_set_string(s, "url",
+			QStringLiteral("http://127.0.0.1:%1/").arg(alertServer->port()).toUtf8().constData());
+		obs_data_set_int(s, "width", 1920);
+		obs_data_set_int(s, "height", 1080);
+		obs_data_set_bool(s, "reroute_audio", true);
+		src = obs_source_create("browser_source", kName, s, nullptr);
+		obs_data_release(s);
+	}
+	if (!src)
+		return;
+
+	obs_source_t *sceneSource = obs_frontend_get_current_scene();
+	if (sceneSource) {
+		obs_scene_t *scene = obs_scene_from_source(sceneSource);
+		if (scene && !obs_scene_find_source(scene, kName))
+			obs_scene_add(scene, src);
+		obs_source_release(sceneSource);
+	}
+	obs_source_release(src);
 }
 
 void SymStudioAlertsDock::updateCanvas(const QString &text)
