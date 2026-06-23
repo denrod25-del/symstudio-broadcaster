@@ -267,7 +267,7 @@ void WhatsNewInfoThread::run()
 try {
 	std::string text;
 
-	if (FetchAndVerifyFile("whatsnew", "obs-studio/updates/whatsnew.json", WHATSNEW_URL, &text)) {
+	if (FetchAndVerifyFile("whatsnew", "SymStudio/updates/whatsnew.json", WHATSNEW_URL, &text)) {
 		emit Result(text);
 	}
 } catch (std::string &text) {

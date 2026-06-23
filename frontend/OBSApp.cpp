@@ -407,34 +407,34 @@ static bool MakeUserDirs()
 {
 	char path[512];
 
-	if (GetAppConfigPath(path, sizeof(path), "obs-studio/basic") <= 0)
+	if (GetAppConfigPath(path, sizeof(path), "SymStudio/basic") <= 0)
 		return false;
 	if (!do_mkdir(path))
 		return false;
 
-	if (GetAppConfigPath(path, sizeof(path), "obs-studio/logs") <= 0)
+	if (GetAppConfigPath(path, sizeof(path), "SymStudio/logs") <= 0)
 		return false;
 	if (!do_mkdir(path))
 		return false;
 
-	if (GetAppConfigPath(path, sizeof(path), "obs-studio/profiler_data") <= 0)
+	if (GetAppConfigPath(path, sizeof(path), "SymStudio/profiler_data") <= 0)
 		return false;
 	if (!do_mkdir(path))
 		return false;
 
 #ifdef _WIN32
-	if (GetAppConfigPath(path, sizeof(path), "obs-studio/crashes") <= 0)
+	if (GetAppConfigPath(path, sizeof(path), "SymStudio/crashes") <= 0)
 		return false;
 	if (!do_mkdir(path))
 		return false;
 #endif
 
-	if (GetAppConfigPath(path, sizeof(path), "obs-studio/updates") <= 0)
+	if (GetAppConfigPath(path, sizeof(path), "SymStudio/updates") <= 0)
 		return false;
 	if (!do_mkdir(path))
 		return false;
 
-	if (GetAppConfigPath(path, sizeof(path), "obs-studio/plugin_config") <= 0)
+	if (GetAppConfigPath(path, sizeof(path), "SymStudio/plugin_config") <= 0)
 		return false;
 	if (!do_mkdir(path))
 		return false;
@@ -442,9 +442,9 @@ static bool MakeUserDirs()
 	return true;
 }
 
-constexpr std::string_view OBSProfileSubDirectory = "obs-studio/basic/profiles";
-constexpr std::string_view OBSScenesSubDirectory = "obs-studio/basic/scenes";
-constexpr std::string_view OBSPluginManagerSubDirectory = "obs-studio/plugin_manager";
+constexpr std::string_view OBSProfileSubDirectory = "SymStudio/basic/profiles";
+constexpr std::string_view OBSScenesSubDirectory = "SymStudio/basic/scenes";
+constexpr std::string_view OBSPluginManagerSubDirectory = "SymStudio/plugin_manager";
 
 static bool MakeUserProfileDirs()
 {
@@ -524,7 +524,7 @@ bool OBSApp::InitGlobalConfig()
 {
 	char path[512];
 
-	int len = GetAppConfigPath(path, sizeof(path), "obs-studio/global.ini");
+	int len = GetAppConfigPath(path, sizeof(path), "SymStudio/global.ini");
 	if (len <= 0) {
 		return false;
 	}
@@ -809,7 +809,7 @@ bool LoadBranchesFile(vector<UpdateBranch> &out)
 	string error;
 	string branchesText;
 
-	BPtr<char> branchesFilePath = GetAppConfigPathPtr("obs-studio/updates/branches.json");
+	BPtr<char> branchesFilePath = GetAppConfigPathPtr("SymStudio/updates/branches.json");
 
 	QFile branchesFile(branchesFilePath.Get());
 	if (!branchesFile.open(QIODevice::ReadOnly)) {
@@ -943,7 +943,7 @@ static void move_basic_to_profiles(void)
 {
 	char path[512];
 
-	if (GetAppConfigPath(path, 512, "obs-studio/basic") <= 0) {
+	if (GetAppConfigPath(path, 512, "SymStudio/basic") <= 0) {
 		return;
 	}
 
@@ -954,7 +954,7 @@ static void move_basic_to_profiles(void)
 	}
 
 	const std::filesystem::path profilesPath =
-		App()->userProfilesLocation / std::filesystem::u8path("obs-studio/basic/profiles");
+		App()->userProfilesLocation / std::filesystem::u8path("SymStudio/basic/profiles");
 
 	if (std::filesystem::exists(profilesPath)) {
 		return;
@@ -1007,7 +1007,7 @@ static void move_basic_to_scene_collections(void)
 {
 	char path[512];
 
-	if (GetAppConfigPath(path, 512, "obs-studio/basic") <= 0) {
+	if (GetAppConfigPath(path, 512, "SymStudio/basic") <= 0) {
 		return;
 	}
 
@@ -1018,7 +1018,7 @@ static void move_basic_to_scene_collections(void)
 	}
 
 	const std::filesystem::path sceneCollectionPath =
-		App()->userScenesLocation / std::filesystem::u8path("obs-studio/basic/scenes");
+		App()->userScenesLocation / std::filesystem::u8path("SymStudio/basic/scenes");
 
 	if (std::filesystem::exists(sceneCollectionPath)) {
 		return;
@@ -1135,7 +1135,7 @@ static bool StartupOBS(const char *locale, profiler_name_store_t *store)
 {
 	char path[512];
 
-	if (GetAppConfigPath(path, sizeof(path), "obs-studio/plugin_config") <= 0)
+	if (GetAppConfigPath(path, sizeof(path), "SymStudio/plugin_config") <= 0)
 		return false;
 
 	return obs_startup(locale, path, store);
@@ -1395,14 +1395,14 @@ void OBSApp::uploadLastAppLog() const
 {
 	OBSBasic *basicWindow = static_cast<OBSBasic *>(GetMainWindow());
 
-	basicWindow->UploadLog("obs-studio/logs", GetLastLog(), OBS::LogFileType::LastAppLog);
+	basicWindow->UploadLog("SymStudio/logs", GetLastLog(), OBS::LogFileType::LastAppLog);
 }
 
 void OBSApp::uploadCurrentAppLog() const
 {
 	OBSBasic *basicWindow = static_cast<OBSBasic *>(GetMainWindow());
 
-	basicWindow->UploadLog("obs-studio/logs", GetCurrentLog(), OBS::LogFileType::CurrentAppLog);
+	basicWindow->UploadLog("SymStudio/logs", GetCurrentLog(), OBS::LogFileType::CurrentAppLog);
 }
 
 void OBSApp::uploadLastCrashLog()

@@ -926,7 +926,7 @@ bool OBSApp::SetTheme(const QString &name)
 
 #ifdef _DEBUG
 	/* Write resulting QSS to file in config dir "themes" folder. */
-	string filename("obs-studio/themes/");
+	string filename("SymStudio/themes/");
 	filename += theme->id.toStdString();
 	filename += ".out";
 
@@ -993,7 +993,7 @@ bool OBSApp::InitTheme()
 	}
 
 	char userDir[512];
-	if (GetAppConfigPath(userDir, sizeof(userDir), "obs-studio/themes")) {
+	if (GetAppConfigPath(userDir, sizeof(userDir), "SymStudio/themes")) {
 		auto configSearchDir = filesystem::u8path(userDir);
 		QDir::addSearchPath("theme", absolute(configSearchDir));
 	}

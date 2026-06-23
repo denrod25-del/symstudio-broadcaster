@@ -299,7 +299,7 @@ void OBSBasic::UploadLog(const char *subdir, const char *file, const LogUploadTy
 void OBSBasic::on_actionShowLogs_triggered()
 {
 	char logDir[512];
-	if (GetAppConfigPath(logDir, sizeof(logDir), "obs-studio/logs") <= 0)
+	if (GetAppConfigPath(logDir, sizeof(logDir), "SymStudio/logs") <= 0)
 		return;
 
 	QUrl url = QUrl::fromLocalFile(QT_UTF8(logDir));
