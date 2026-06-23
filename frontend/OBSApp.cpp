@@ -48,6 +48,7 @@
 #endif
 
 #include <chrono>
+#include <filesystem>
 
 #ifdef _WIN32
 #include <sstream>
@@ -403,9 +404,43 @@ static bool do_mkdir(const char *path)
 	return true;
 }
 
+/* One-time migration: if the new SymStudio config dir does not exist yet but a
+ * legacy obs-studio dir does, copy it once so existing users keep their scenes,
+ * profiles, and settings. The old dir is left untouched. */
+static void MigrateLegacyConfig()
+{
+	char base[512];
+	if (GetAppConfigPath(base, sizeof(base), nullptr) <= 0)
+		return;
+
+	namespace fs = std::filesystem;
+	std::error_code ec;
+	const fs::path basePath = fs::u8path(base);
+	const fs::path symPath = basePath / "SymStudio";
+	const fs::path legacyPath = basePath / "obs-studio";
+
+	if (fs::exists(symPath, ec))
+		return; /* already migrated or fresh-with-SymStudio */
+	if (!fs::exists(legacyPath, ec))
+		return; /* nothing to migrate (new user) */
+
+	fs::copy(legacyPath, symPath, fs::copy_options::recursive | fs::copy_options::copy_symlinks, ec);
+	if (ec) {
+		/* On partial failure, remove the half-copied dir so we start clean
+		 * rather than with corrupt settings. */
+		blog(LOG_WARNING, "[SymStudio] config migration failed: %s", ec.message().c_str());
+		std::error_code rmEc;
+		fs::remove_all(symPath, rmEc);
+	} else {
+		blog(LOG_INFO, "[SymStudio] migrated legacy obs-studio config to SymStudio");
+	}
+}
+
 static bool MakeUserDirs()
 {
 	char path[512];
+
+	MigrateLegacyConfig();
 
 	if (GetAppConfigPath(path, sizeof(path), "SymStudio/basic") <= 0)
 		return false;
