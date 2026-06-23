@@ -487,10 +487,15 @@ function(_bundle_dependencies target)
 
     cmake_path(GET plugin PARENT_PATH plugin_path)
     cmake_path(GET plugin_path STEM plugin_stem)
+    cmake_path(GET plugin STEM plugin_filestem)
 
     list(APPEND plugin_stems ${plugin_stem})
 
-    if(plugin MATCHES "(.+d)\\.dll$" AND CMAKE_MATCH_COUNT EQUAL 1 AND NOT CMAKE_MATCH_1 IN_LIST debug_dll_exceptions)
+    # Compare the filename stem (e.g. "qschannelbackend"), not the full path, to
+    # the release-DLL-ending-in-'d' exceptions — otherwise release backends whose
+    # names end in 'd' (the whole tls category) get misfiled as debug, leaving the
+    # release copy list empty and breaking deployment.
+    if(plugin MATCHES "(.+d)\\.dll$" AND CMAKE_MATCH_COUNT EQUAL 1 AND NOT plugin_filestem IN_LIST debug_dll_exceptions)
       list(APPEND plugin_${plugin_stem}_debug ${plugin})
     else()
       list(APPEND plugin_${plugin_stem} ${plugin})
