@@ -56,8 +56,13 @@ void SymStudioUpdate::check(bool manual)
 		const int code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 		if (code != 200) {
 			if (manual)
-				QMessageBox::information(parentWidget, QStringLiteral("SymStudio"),
-							 QStringLiteral("Could not check for updates right now."));
+				QMessageBox::information(
+					parentWidget, QStringLiteral("SymStudio"),
+					QStringLiteral("Could not check for updates right now.\n"
+						       "(HTTP %1 / err %2: %3)")
+						.arg(code)
+						.arg((int)reply->error())
+						.arg(reply->errorString()));
 			return;
 		}
 

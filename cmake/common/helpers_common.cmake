@@ -233,6 +233,7 @@ function(find_qt_plugins)
     styles
     imageformats
     iconengines
+    tls
   )
   list(APPEND qt_plugins_Gui platforminputcontexts)
   list(APPEND qt_plugins_Sql sqldrivers)
