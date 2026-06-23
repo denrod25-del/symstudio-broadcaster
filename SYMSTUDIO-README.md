@@ -107,3 +107,8 @@ license text (Help → About → License) and the `AUTHORS` file for OBS contrib
   it is a no-op, so unsigned dev builds still work. To remove the Windows SmartScreen "unknown
   publisher" warning for public releases, obtain a signing identity (e.g. Azure Trusted Signing, or
   SignPath's free OSS program) and run sign.ps1 in your release step.
+
+- **Twitch login (single app):** SymStudio ships with its own Twitch app, so you just click Login
+  in the Stream Info dock (device-code flow — a code + twitch.tv/activate page; no dev.twitch.tv
+  setup, no Client ID to paste). The Stream Tracker and other Twitch features reuse that login.
+  Existing users who had pasted their own Client ID are logged out once and simply log in again.
