@@ -18,6 +18,7 @@
 ******************************************************************************/
 
 #include "OBSBasic.hpp"
+#include "SymStudioUpdate.hpp"
 
 #include <dialogs/OBSWhatsNew.hpp>
 
@@ -197,13 +198,10 @@ void OBSBasic::TimedCheckForUpdates()
 void OBSBasic::CheckForUpdates(bool manualUpdate)
 {
 #if _WIN32
-	ui->actionCheckForUpdates->setEnabled(false);
-	ui->actionRepair->setEnabled(false);
-
-	if (updateCheckThread && updateCheckThread->isRunning())
-		return;
-	updateCheckThread.reset(new AutoUpdateThread(manualUpdate));
-	updateCheckThread->start();
+	// SymStudio: check GitHub Releases and notify — no OBS update servers.
+	auto *upd = new SymStudioUpdate(this);
+	upd->check(manualUpdate);
+	ui->actionCheckForUpdates->setEnabled(true);
 #elif defined(ENABLE_SPARKLE_UPDATER)
 	ui->actionCheckForUpdates->setEnabled(false);
 
