@@ -1,5 +1,6 @@
 #include "SymStudioTrackerDock.hpp"
 #include "OBSApp.hpp"
+#include "SymStudioTwitch.hpp"
 
 #include <QLineEdit>
 #include <QPushButton>
@@ -113,10 +114,9 @@ void SymStudioTrackerDock::onSave()
 void SymStudioTrackerDock::onPoll()
 {
 	const char *tokC = config_get_string(App()->GetUserConfig(), "SymStudioTwitch", "AccessToken");
-	const char *idC = config_get_string(App()->GetUserConfig(), "SymStudioTwitch", "ClientID");
 	const QString token = tokC ? QString::fromUtf8(tokC) : QString();
-	const QString clientId = idC ? QString::fromUtf8(idC) : QString();
-	if (token.isEmpty() || clientId.isEmpty()) {
+	const QString clientId = QStringLiteral(SYMSTUDIO_TWITCH_CLIENT_ID);
+	if (token.isEmpty()) {
 		setStatus(QStringLiteral("Log in via the Stream Info dock first."));
 		return;
 	}
