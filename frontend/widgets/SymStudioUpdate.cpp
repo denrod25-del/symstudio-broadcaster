@@ -12,7 +12,7 @@
 #include <QJsonObject>
 #include <QRegularExpression>
 
-#include <obs-config.h>
+#include <obs.h>
 
 #define SYMSTUDIO_REPO "denrod25-del/symstudio-broadcaster"
 
@@ -66,7 +66,8 @@ void SymStudioUpdate::check(bool manual)
 		const QString htmlUrl = o.value(QStringLiteral("html_url")).toString();
 
 		int latest[3], current[3];
-		parseVersion(QString::fromUtf8(OBS_VERSION_CANONICAL), current);
+		const QString currentVer = QString::fromUtf8(obs_get_version_string());
+		parseVersion(currentVer, current);
 
 		if (!parseVersion(tag, latest) || !isNewer(latest, current)) {
 			if (manual)
@@ -78,8 +79,7 @@ void SymStudioUpdate::check(bool manual)
 		QMessageBox box(parentWidget);
 		box.setWindowTitle(QStringLiteral("SymStudio"));
 		box.setText(QStringLiteral("SymStudio %1 is available.").arg(tag));
-		box.setInformativeText(
-			QStringLiteral("You're on %1.").arg(QString::fromUtf8(OBS_VERSION_CANONICAL)));
+		box.setInformativeText(QStringLiteral("You're on %1.").arg(currentVer));
 		QPushButton *open = box.addButton(QStringLiteral("Open download page"), QMessageBox::AcceptRole);
 		box.addButton(QStringLiteral("Later"), QMessageBox::RejectRole);
 		box.exec();
