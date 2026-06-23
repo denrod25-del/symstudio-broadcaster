@@ -1,5 +1,6 @@
 #include "SymStudioStreamDock.hpp"
 #include "OBSApp.hpp"
+#include "SymStudioTwitch.hpp"
 
 #include <QLineEdit>
 #include <QPushButton>
@@ -29,14 +30,6 @@ SymStudioStreamDock::SymStudioStreamDock(QWidget *parent) : QWidget(parent)
 	QVBoxLayout *root = new QVBoxLayout(this);
 	root->setContentsMargins(8, 8, 8, 8);
 	root->setSpacing(6);
-
-	QHBoxLayout *idRow = new QHBoxLayout();
-	clientIdEdit = new QLineEdit(this);
-	clientIdEdit->setPlaceholderText(QStringLiteral("Twitch app Client ID"));
-	saveIdBtn = new QPushButton(QStringLiteral("Save"), this);
-	idRow->addWidget(clientIdEdit, 1);
-	idRow->addWidget(saveIdBtn);
-	root->addLayout(idRow);
 
 	QHBoxLayout *authRow = new QHBoxLayout();
 	loginBtn = new QPushButton(QStringLiteral("Login to Twitch"), this);
@@ -71,7 +64,6 @@ SymStudioStreamDock::SymStudioStreamDock(QWidget *parent) : QWidget(parent)
 	root->addStretch(1);
 	setLayout(root);
 
-	connect(saveIdBtn, &QPushButton::clicked, this, &SymStudioStreamDock::onSaveClientId);
 	connect(loginBtn, &QPushButton::clicked, this, &SymStudioStreamDock::onLoginClicked);
 	connect(logoutBtn, &QPushButton::clicked, this, &SymStudioStreamDock::onLogoutClicked);
 	connect(searchBtn, &QPushButton::clicked, this, &SymStudioStreamDock::onSearchCategory);
@@ -98,21 +90,35 @@ void SymStudioStreamDock::loadConfig()
 		const char *v = config_get_string(App()->GetUserConfig(), "SymStudioTwitch", k);
 		return v ? QString::fromUtf8(v) : QString();
 	};
-	clientId = get("ClientID");
 	accessToken = get("AccessToken");
 	refreshToken = get("RefreshToken");
 	broadcasterId = get("BroadcasterId");
 	login = get("Login");
-	if (!clientId.isEmpty())
-		clientIdEdit->setText(clientId);
+
+	// One-time migration: a token issued under a different (user-registered)
+	// client ID won't work with the shared SymStudio app, so clear it and force
+	// a clean re-login. New users have no stored ClientID and are unaffected.
+	const QString storedId = get("ClientID");
+	if (!storedId.isEmpty() && storedId != QStringLiteral(SYMSTUDIO_TWITCH_CLIENT_ID)) {
+		accessToken.clear();
+		refreshToken.clear();
+		broadcasterId.clear();
+		login.clear();
+		saveStr("AccessToken", "");
+		saveStr("RefreshToken", "");
+		saveStr("BroadcasterId", "");
+		saveStr("Login", "");
+	}
+
+	clientId = QStringLiteral(SYMSTUDIO_TWITCH_CLIENT_ID);
+	saveStr("ClientID", clientId);
 }
 
 void SymStudioStreamDock::updateUiState()
 {
-	const bool hasId = !clientId.isEmpty();
 	const bool loggedIn = !accessToken.isEmpty() && !broadcasterId.isEmpty();
 
-	loginBtn->setVisible(hasId && !loggedIn);
+	loginBtn->setVisible(!loggedIn);
 	logoutBtn->setVisible(loggedIn);
 	titleEdit->setEnabled(loggedIn);
 	categoryEdit->setEnabled(loggedIn);
@@ -120,19 +126,10 @@ void SymStudioStreamDock::updateUiState()
 	categoryResults->setEnabled(loggedIn);
 	updateBtn->setEnabled(loggedIn);
 
-	if (!hasId)
-		setStatus(QStringLiteral("Enter your Twitch app Client ID (dev.twitch.tv) and Save."));
-	else if (loggedIn)
+	if (loggedIn)
 		setStatus(QStringLiteral("Logged in as %1").arg(login));
 	else
 		setStatus(QStringLiteral("Click Login to connect your Twitch account."));
-}
-
-void SymStudioStreamDock::onSaveClientId()
-{
-	clientId = clientIdEdit->text().trimmed();
-	saveStr("ClientID", clientId);
-	updateUiState();
 }
 
 void SymStudioStreamDock::onLogoutClicked()
@@ -162,7 +159,7 @@ void SymStudioStreamDock::startDeviceFlow()
 	req.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/x-www-form-urlencoded"));
 	QUrlQuery q;
 	q.addQueryItem(QStringLiteral("client_id"), clientId);
-	q.addQueryItem(QStringLiteral("scopes"), QStringLiteral("channel:manage:broadcast"));
+	q.addQueryItem(QStringLiteral("scopes"), QStringLiteral(SYMSTUDIO_TWITCH_SCOPES));
 	QNetworkReply *reply = nam->post(req, q.toString(QUrl::FullyEncoded).toUtf8());
 	connect(reply, &QNetworkReply::finished, this, [this, reply]() {
 		reply->deleteLater();
@@ -195,7 +192,7 @@ void SymStudioStreamDock::onPollTick()
 	req.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/x-www-form-urlencoded"));
 	QUrlQuery q;
 	q.addQueryItem(QStringLiteral("client_id"), clientId);
-	q.addQueryItem(QStringLiteral("scopes"), QStringLiteral("channel:manage:broadcast"));
+	q.addQueryItem(QStringLiteral("scopes"), QStringLiteral(SYMSTUDIO_TWITCH_SCOPES));
 	q.addQueryItem(QStringLiteral("device_code"), deviceCode);
 	q.addQueryItem(QStringLiteral("grant_type"), QStringLiteral("urn:ietf:params:oauth:grant-type:device_code"));
 	QNetworkReply *reply = nam->post(req, q.toString(QUrl::FullyEncoded).toUtf8());

@@ -18,7 +18,6 @@ public:
 	explicit SymStudioStreamDock(QWidget *parent = nullptr);
 
 private slots:
-	void onSaveClientId();
 	void onLoginClicked();
 	void onLogoutClicked();
 	void onPollTick();
@@ -39,8 +38,6 @@ private:
 	QString clientId, accessToken, refreshToken, broadcasterId, login, deviceCode;
 	QString selectedGameId;
 
-	QLineEdit *clientIdEdit = nullptr;
-	QPushButton *saveIdBtn = nullptr;
 	QPushButton *loginBtn = nullptr;
 	QPushButton *logoutBtn = nullptr;
 	QLabel *statusLabel = nullptr;
