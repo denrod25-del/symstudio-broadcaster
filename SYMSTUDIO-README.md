@@ -93,3 +93,17 @@ license text (Help → About → License) and the `AUTHORS` file for OBS contrib
 
 
 - **Animated alert overlays** — the Alerts dock can also show real animated, sounded alerts on canvas (tick "Animated overlay (browser)"). SymStudio runs a tiny local server (127.0.0.1:28782) serving an HTML/CSS overlay; it auto-adds a "SymStudio Alert Overlay" browser source to your current scene (position it once). Slide-in/pop/fade + a Web-Audio chime, all restyleable in HTML. Independent of the text on-canvas mode.
+
+## Distribution
+
+- **Config directory:** SymStudio stores settings under `%APPDATA%\SymStudio` (separate from a real
+  OBS install). On first launch, if that folder is empty and a legacy `%APPDATA%\obs-studio` exists,
+  SymStudio copies it once so you keep your scenes/profiles/logins; the old folder is left untouched.
+- **Updates:** Help -> Check for Updates queries the latest GitHub release
+  (denrod25-del/symstudio-broadcaster) and links to the download page if a newer version exists.
+  There is no silent auto-install; SymStudio does not contact OBS's update servers.
+- **Code signing:** `cmake/windows/sign.ps1` signs the exe + installer when signing credentials are
+  present (set `SYMSTUDIO_SIGN_THUMBPRINT` to a cert thumbprint in your store). With no credentials
+  it is a no-op, so unsigned dev builds still work. To remove the Windows SmartScreen "unknown
+  publisher" warning for public releases, obtain a signing identity (e.g. Azure Trusted Signing, or
+  SignPath's free OSS program) and run sign.ps1 in your release step.
