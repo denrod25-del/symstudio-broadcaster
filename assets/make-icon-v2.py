@@ -66,4 +66,20 @@ frames[0].save(os.path.join(A, "symstudio-icon.ico"), format="ICO",
 # Window/taskbar icon (single PNG Qt scales): clean aperture, plus a mono fallback
 aperture(256).save(os.path.join(A, "symstudio-window.png"))
 mono(256).save(os.path.join(A, "symstudio-mono.png"))
+
+# Social / OG preview image (1200x630): dark card + aperture + wordmark + tagline
+def og():
+    W, H = 1200, 630
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    img.paste(vgrad(H, (16, 12, 30), (7, 6, 14)).resize((W, H)), (0, 0))
+    d = ImageDraw.Draw(img)
+    logo = aperture(300)
+    img.alpha_composite(logo, (110, (H - 300) // 2))
+    d.text((460, 232), "SymStudio", font=font(86), fill=WHITE, anchor="lm")
+    d.text((462, 322), "Everything you need to go live.", font=font(40), fill=CYAN, anchor="lm")
+    d.text((462, 384), "Free, open streaming studio - based on OBS Studio",
+           font=font(28), fill=(150, 163, 178, 255), anchor="lm")
+    img.convert("RGB").save(os.path.join(A, "symstudio-og.png"))
+
+og()
 print("ico frames:", sizes)
