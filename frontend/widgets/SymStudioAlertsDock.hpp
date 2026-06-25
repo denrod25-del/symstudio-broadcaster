@@ -12,6 +12,7 @@ class QTextEdit;
 class QTcpSocket;
 class QTimer;
 class SymStudioAlertServer;
+class SymStudioEventSub;
 
 // SymStudio Twitch alerts dock — anonymous IRC USERNOTICE/bits -> feed + on-canvas text.
 class SymStudioAlertsDock : public QWidget {
@@ -48,6 +49,8 @@ private:
 	QLabel *overlayInfo = nullptr;
 
 	SymStudioAlertServer *alertServer = nullptr;
+	SymStudioEventSub *eventSub = nullptr;
+	bool eventSubActive = false;
 	QTcpSocket *socket = nullptr;
 	QTimer *clearTimer = nullptr;
 	QByteArray rxBuffer;

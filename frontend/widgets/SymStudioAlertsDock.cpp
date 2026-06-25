@@ -1,5 +1,6 @@
 #include "SymStudioAlertsDock.hpp"
 #include "SymStudioAlertServer.hpp"
+#include "SymStudioEventSub.hpp"
 #include "OBSApp.hpp"
 
 #include <QLineEdit>
@@ -130,6 +131,26 @@ SymStudioAlertsDock::SymStudioAlertsDock(QWidget *parent) : QWidget(parent)
 		config_set_bool(App()->GetUserConfig(), "SymStudioAlerts", "AnimatedOverlay", on);
 		config_save_safe(App()->GetUserConfig(), "tmp", nullptr);
 	});
+
+	// Real-time EventSub alerts when logged in (Stream Info); IRC stays the fallback.
+	eventSub = new SymStudioEventSub(this);
+	connect(eventSub, &SymStudioEventSub::alert, this,
+		[this](const QString &t, const QString &k) { addAlert(t, k); });
+	connect(eventSub, &SymStudioEventSub::status, this, [this](const QString &s) {
+		statusLabel->setText(s);
+		eventSubActive = s.startsWith(QStringLiteral("EventSub: live"));
+	});
+	{
+		auto cfgGet = [](const char *k) -> QString {
+			const char *v = config_get_string(App()->GetUserConfig(), "SymStudioTwitch", k);
+			return v ? QString::fromUtf8(v) : QString();
+		};
+		const QString tok = cfgGet("AccessToken");
+		const QString bid = cfgGet("BroadcasterId");
+		const QString cid = cfgGet("ClientID");
+		if (!tok.isEmpty() && !bid.isEmpty() && !cid.isEmpty())
+			eventSub->start(bid, tok, cid);
+	}
 }
 
 SymStudioAlertsDock::~SymStudioAlertsDock()
@@ -139,6 +160,10 @@ SymStudioAlertsDock::~SymStudioAlertsDock()
 	if (socket) {
 		socket->disconnect(this);
 		socket->abort();
+	}
+	if (eventSub) {
+		eventSub->disconnect(this);
+		eventSub->stop();
 	}
 }
 
@@ -236,6 +261,9 @@ void SymStudioAlertsDock::handleLine(const QString &lineIn)
 	}
 	const QString command = rest.section(' ', 0, 0);
 	const QHash<QString, QString> tags = parseTags(tagStr);
+
+	if (eventSubActive)
+		return; // EventSub is the source of truth while connected (no IRC duplicates)
 
 	if (command == QStringLiteral("USERNOTICE")) {
 		const QString sys = tags.value(QStringLiteral("system-msg"));

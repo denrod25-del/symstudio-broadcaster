@@ -75,4 +75,6 @@ target_sources(
     widgets/SymStudioAlertServer.hpp
     widgets/SymStudioUpdate.cpp
     widgets/SymStudioUpdate.hpp
+    widgets/SymStudioEventSub.cpp
+    widgets/SymStudioEventSub.hpp
 )
