@@ -114,3 +114,5 @@ license text (Help → About → License) and the `AUTHORS` file for OBS contrib
   Existing users who had pasted their own Client ID are logged out once and simply log in again.
 
 - **Real-time alerts (EventSub):** when logged in (Stream Info), SymStudio connects to Twitch EventSub over WebSocket and shows real-time follows, subs, resubs, gift subs, cheers and raids in the Alerts dock + on-canvas + animated overlay. Follows need a login (anonymous IRC can't see them); while EventSub is connected the IRC alert path is suppressed to avoid duplicates, and it resumes as a fallback when logged out.
+
+- **Privacy Guard:** a dock with a global panic-blackout hotkey (bind it in Settings -> Hotkeys) that instantly covers the whole output in opaque black — press again to reveal — plus one-click opaque "privacy boxes" you drag over sensitive areas (unlimited, persist per scene). Reliable manual controls only; it does not auto-detect text, so you place the protection (opaque, not blur, since blur is partially reversible).
