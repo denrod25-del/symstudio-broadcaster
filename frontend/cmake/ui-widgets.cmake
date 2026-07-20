@@ -79,4 +79,6 @@ target_sources(
     widgets/SymStudioEventSub.hpp
     widgets/SymStudioPrivacyDock.cpp
     widgets/SymStudioPrivacyDock.hpp
+    widgets/SymStudioMultistreamDock.cpp
+    widgets/SymStudioMultistreamDock.hpp
 )

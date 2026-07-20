@@ -38,6 +38,7 @@
 #include "SymStudioSymbolicDock.hpp"
 #include "SymStudioTrackerDock.hpp"
 #include "SymStudioPrivacyDock.hpp"
+#include "SymStudioMultistreamDock.hpp"
 #include <dialogs/NameDialog.hpp>
 #include <dialogs/OBSAbout.hpp>
 #include <dialogs/OBSBasicAdvAudio.hpp>
@@ -451,6 +452,17 @@ OBSBasic::OBSBasic(QWidget *parent) : OBSMainWindow(parent), undo_s(ui), ui(new 
 	addDockWidget(Qt::RightDockWidgetArea, privacyDock);
 	privacyDock->setFloating(false);
 	ui->menuDocks->addAction(privacyDock->toggleViewAction());
+
+	/* --- SymStudio Multistream dock --- */
+	OBSDock *multiDock = new OBSDock();
+	multiDock->setObjectName(QStringLiteral("symStudioMultiDock"));
+	multiDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable |
+			       QDockWidget::DockWidgetFloatable);
+	multiDock->setWindowTitle(QStringLiteral("Multistream"));
+	multiDock->setWidget(new SymStudioMultistreamDock());
+	addDockWidget(Qt::RightDockWidgetArea, multiDock);
+	multiDock->setFloating(false);
+	ui->menuDocks->addAction(multiDock->toggleViewAction());
 
 	copyActionsDynamicProperties();
 
