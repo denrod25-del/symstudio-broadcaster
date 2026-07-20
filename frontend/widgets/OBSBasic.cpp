@@ -37,6 +37,7 @@
 #include "SymStudioAlertsDock.hpp"
 #include "SymStudioSymbolicDock.hpp"
 #include "SymStudioTrackerDock.hpp"
+#include "SymStudioPrivacyDock.hpp"
 #include <dialogs/NameDialog.hpp>
 #include <dialogs/OBSAbout.hpp>
 #include <dialogs/OBSBasicAdvAudio.hpp>
@@ -439,6 +440,17 @@ OBSBasic::OBSBasic(QWidget *parent) : OBSMainWindow(parent), undo_s(ui), ui(new 
 	addDockWidget(Qt::RightDockWidgetArea, trackerDock);
 	trackerDock->setFloating(false);
 	ui->menuDocks->addAction(trackerDock->toggleViewAction());
+
+	/* --- SymStudio Privacy Guard dock --- */
+	OBSDock *privacyDock = new OBSDock();
+	privacyDock->setObjectName(QStringLiteral("symStudioPrivacyDock"));
+	privacyDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable |
+				 QDockWidget::DockWidgetFloatable);
+	privacyDock->setWindowTitle(QStringLiteral("Privacy Guard"));
+	privacyDock->setWidget(new SymStudioPrivacyDock());
+	addDockWidget(Qt::RightDockWidgetArea, privacyDock);
+	privacyDock->setFloating(false);
+	ui->menuDocks->addAction(privacyDock->toggleViewAction());
 
 	copyActionsDynamicProperties();
 

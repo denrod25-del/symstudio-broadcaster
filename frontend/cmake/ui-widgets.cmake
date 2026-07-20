@@ -77,4 +77,6 @@ target_sources(
     widgets/SymStudioUpdate.hpp
     widgets/SymStudioEventSub.cpp
     widgets/SymStudioEventSub.hpp
+    widgets/SymStudioPrivacyDock.cpp
+    widgets/SymStudioPrivacyDock.hpp
 )
