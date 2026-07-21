@@ -240,7 +240,7 @@ void SymStudioStreamDock::fetchUser()
 	});
 }
 
-void SymStudioStreamDock::loadChannelInfo()
+void SymStudioStreamDock::loadChannelInfo(bool allowRefresh)
 {
 	QUrl url(QStringLiteral("https://api.twitch.tv/helix/channels"));
 	QUrlQuery q;
@@ -250,11 +250,16 @@ void SymStudioStreamDock::loadChannelInfo()
 	req.setRawHeader("Authorization", ("Bearer " + accessToken).toUtf8());
 	req.setRawHeader("Client-Id", clientId.toUtf8());
 	QNetworkReply *reply = nam->get(req);
-	connect(reply, &QNetworkReply::finished, this, [this, reply]() {
+	connect(reply, &QNetworkReply::finished, this, [this, reply, allowRefresh]() {
 		reply->deleteLater();
 		const int code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 		if (code == 401) {
-			tryRefreshThen();
+			// Refresh once. If the freshly-refreshed token still 401s, stop here —
+			// otherwise refresh→reload→401→refresh spins network calls forever.
+			if (allowRefresh)
+				tryRefreshThen();
+			else
+				setStatus(QStringLiteral("Session expired — please Log out and Login again."));
 			return;
 		}
 		const QJsonArray data = QJsonDocument::fromJson(reply->readAll())
@@ -358,7 +363,7 @@ bool SymStudioStreamDock::tryRefreshThen()
 		saveStr("AccessToken", accessToken);
 		saveStr("RefreshToken", refreshToken);
 		setStatus(QStringLiteral("Session refreshed."));
-		loadChannelInfo();
+		loadChannelInfo(false); // don't allow this reload to trigger another refresh
 	});
 	return true;
 }

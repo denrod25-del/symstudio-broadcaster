@@ -37,8 +37,8 @@ private:
 	QPushButton *hideAllBtn = nullptr;
 	QListWidget *boxList = nullptr;
 
-	obs_source_t *coverSource = nullptr;   // private, ephemeral full-canvas cover
-	unsigned long long panicHotkeyId = 0;  // obs_hotkey_id
+	obs_source_t *coverSource = nullptr;      // private, ephemeral full-canvas cover
+	unsigned long long panicHotkeyId = ~0ULL; // obs_hotkey_id; ~0 == OBS_INVALID_HOTKEY_ID
 	bool blackoutOn = false;
 	int boxSeq = 0;
 };

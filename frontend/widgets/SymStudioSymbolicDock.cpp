@@ -18,7 +18,8 @@
 
 namespace {
 struct FindCtx {
-	DWORD pid; // 0 = ignore pid, use class/title fallback
+	DWORD pid;       // for enumByPid: the process id to match
+	QString wantExe; // for enumByExe: lowercased exe basename to match (e.g. "symbolic.exe")
 	HWND result;
 };
 BOOL CALLBACK enumByPid(HWND hwnd, LPARAM lp)
@@ -34,19 +35,34 @@ BOOL CALLBACK enumByPid(HWND hwnd, LPARAM lp)
 	}
 	return TRUE;
 }
-BOOL CALLBACK enumByTitle(HWND hwnd, LPARAM lp)
+// Fallback when we have no tracked pid: identify Symbolic by its *process executable*,
+// not by window class + title. "Chrome_WidgetWin_1" is the class for every Chromium /
+// Electron window (Chrome, Edge, VS Code, Slack, Discord…), and a title "contains
+// Symbolic" match could reparent any of them — even VS Code editing this file. Matching
+// the owning process's exe name guarantees we only ever grab the real Symbolic window.
+BOOL CALLBACK enumByExe(HWND hwnd, LPARAM lp)
 {
 	auto *ctx = reinterpret_cast<FindCtx *>(lp);
 	if (!IsWindowVisible(hwnd) || GetWindow(hwnd, GW_OWNER) != nullptr)
 		return TRUE;
-	wchar_t cls[128] = {0};
-	wchar_t title[256] = {0};
-	GetClassNameW(hwnd, cls, 128);
-	GetWindowTextW(hwnd, title, 256);
-	const QString c = QString::fromWCharArray(cls);
-	const QString t = QString::fromWCharArray(title);
-	if (c == QStringLiteral("Chrome_WidgetWin_1") &&
-	    t.contains(QStringLiteral("Symbolic"), Qt::CaseInsensitive)) {
+	if (GetWindowTextLengthW(hwnd) == 0)
+		return TRUE;
+	DWORD pid = 0;
+	GetWindowThreadProcessId(hwnd, &pid);
+	if (!pid)
+		return TRUE;
+	HANDLE proc = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
+	if (!proc)
+		return TRUE;
+	wchar_t path[MAX_PATH] = {0};
+	DWORD sz = MAX_PATH;
+	bool match = false;
+	if (QueryFullProcessImageNameW(proc, 0, path, &sz)) {
+		const QString base = QFileInfo(QString::fromWCharArray(path)).fileName().toLower();
+		match = (base == ctx->wantExe);
+	}
+	CloseHandle(proc);
+	if (match) {
 		ctx->result = hwnd;
 		return FALSE;
 	}
@@ -122,14 +138,17 @@ bool SymStudioSymbolicDock::findWindow()
 #ifdef _WIN32
 	HWND h = nullptr;
 	if (launchedPid) {
-		FindCtx ctx{(DWORD)launchedPid, nullptr};
+		FindCtx ctx{(DWORD)launchedPid, QString(), nullptr};
 		EnumWindows(enumByPid, reinterpret_cast<LPARAM>(&ctx));
 		h = ctx.result;
 	}
 	if (!h) {
-		FindCtx ctx{0, nullptr};
-		EnumWindows(enumByTitle, reinterpret_cast<LPARAM>(&ctx));
-		h = ctx.result;
+		const QString wantExe = QFileInfo(exePath).fileName().toLower();
+		if (!wantExe.isEmpty()) {
+			FindCtx ctx{0, wantExe, nullptr};
+			EnumWindows(enumByExe, reinterpret_cast<LPARAM>(&ctx));
+			h = ctx.result;
+		}
 	}
 	if (h) {
 		embeddedHwnd = reinterpret_cast<void *>(h);
@@ -167,7 +186,10 @@ bool SymStudioSymbolicDock::eventFilter(QObject *obj, QEvent *e)
 #ifdef _WIN32
 	if (obj == host && e->type() == QEvent::Resize && embeddedHwnd) {
 		HWND hwnd = reinterpret_cast<HWND>(embeddedHwnd);
-		MoveWindow(hwnd, 0, 0, host->width(), host->height(), TRUE);
+		if (IsWindow(hwnd))
+			MoveWindow(hwnd, 0, 0, host->width(), host->height(), TRUE);
+		else
+			embeddedHwnd = nullptr; // Symbolic closed — stop touching a dead handle
 	}
 #endif
 	return QWidget::eventFilter(obj, e);
@@ -178,10 +200,15 @@ void SymStudioSymbolicDock::detach()
 #ifdef _WIN32
 	HWND hwnd = reinterpret_cast<HWND>(embeddedHwnd);
 	if (hwnd) {
-		SetParent(hwnd, nullptr);
-		SetWindowLongPtrW(hwnd, GWL_STYLE, (LONG_PTR)savedStyle);
-		SetWindowPos(hwnd, nullptr, 0, 0, 0, 0,
-			     SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+		// Only restore a window that still exists — the handle may be stale (and its
+		// numeric value recycled) if Symbolic exited while embedded.
+		if (IsWindow(hwnd)) {
+			SetParent(hwnd, nullptr);
+			SetWindowLongPtrW(hwnd, GWL_STYLE, (LONG_PTR)savedStyle);
+			SetWindowPos(hwnd, nullptr, 0, 0, 0, 0,
+				     SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED |
+					     SWP_SHOWWINDOW);
+		}
 		embeddedHwnd = nullptr;
 	}
 #endif

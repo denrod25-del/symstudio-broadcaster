@@ -85,6 +85,7 @@ SymStudioMultistreamDock::SymStudioMultistreamDock(QWidget *parent) : QWidget(pa
 void SymStudioMultistreamDock::buildRow(const QString &name, const QString &url, const QString &key, bool enabled)
 {
 	Row *r = new Row();
+	r->id = ++rowSeq;
 	r->w = new QWidget(this);
 	QVBoxLayout *v = new QVBoxLayout(r->w);
 	v->setContentsMargins(8, 6, 8, 6);
@@ -231,7 +232,7 @@ void SymStudioMultistreamDock::startExtras()
 
 		const bool ok = obs_output_start(out);
 		r->status->setText(ok ? QStringLiteral("connecting…") : QStringLiteral("failed to start"));
-		extras.append({out, svc, nm, 0});
+		extras.append({out, svc, r->id, 0});
 	}
 
 	obs_output_release(mainOut);
@@ -272,9 +273,7 @@ void SymStudioMultistreamDock::pollStatus()
 	for (Extra &e : extras) {
 		Row *row = nullptr;
 		for (Row *r : rows) {
-			const QString nm = r->name->text().trimmed().isEmpty() ? QStringLiteral("dest")
-									       : r->name->text().trimmed();
-			if (nm == e.name) {
+			if (r->id == e.rowId) {
 				row = r;
 				break;
 			}

@@ -102,7 +102,7 @@ SymStudioPrivacyDock::~SymStudioPrivacyDock()
 {
 	obs_frontend_remove_event_callback(PrivacyFrontendEvent, this);
 	saveHotkey();
-	if (panicHotkeyId)
+	if (panicHotkeyId != OBS_INVALID_HOTKEY_ID)
 		obs_hotkey_unregister(panicHotkeyId);
 	if (coverSource)
 		obs_source_release(coverSource);
@@ -140,11 +140,17 @@ void SymStudioPrivacyDock::togglePanic()
 		struct vec2 pos = {0.0f, 0.0f};
 		obs_sceneitem_set_pos(item, &pos);
 	}
-	blackoutOn = !blackoutOn;
+	// Derive the target from THIS scene's cover, not a global flag. Otherwise, after a
+	// scene switch, a stale global bool could make PANIC reveal instead of black out —
+	// the worst-case failure for a privacy feature. If the current scene isn't covered,
+	// pressing PANIC always blacks it out.
+	const bool currentlyCovered = item && obs_sceneitem_visible(item);
+	const bool target = !currentlyCovered;
 	if (item) {
 		obs_sceneitem_set_order(item, OBS_ORDER_MOVE_TOP);
-		obs_sceneitem_set_visible(item, blackoutOn);
+		obs_sceneitem_set_visible(item, target);
 	}
+	blackoutOn = target;
 	obs_source_release(scnSrc);
 	updatePanicUi();
 }
@@ -262,7 +268,7 @@ void SymStudioPrivacyDock::loadHotkey()
 		return;
 	obs_data_t *d = obs_data_create_from_json(j);
 	obs_data_array_t *arr = obs_data_get_array(d, "b");
-	if (arr)
+	if (arr && panicHotkeyId != OBS_INVALID_HOTKEY_ID)
 		obs_hotkey_load(panicHotkeyId, arr);
 	obs_data_array_release(arr);
 	obs_data_release(d);
@@ -270,7 +276,7 @@ void SymStudioPrivacyDock::loadHotkey()
 
 void SymStudioPrivacyDock::saveHotkey()
 {
-	if (!panicHotkeyId)
+	if (panicHotkeyId == OBS_INVALID_HOTKEY_ID)
 		return;
 	obs_data_array_t *arr = obs_hotkey_save(panicHotkeyId);
 	obs_data_t *d = obs_data_create();

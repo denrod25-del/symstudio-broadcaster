@@ -34,6 +34,7 @@ private slots:
 
 private:
 	struct Row {
+		int id; // stable, unique per row — used to map an Extra back to its row
 		QWidget *w;
 		QCheckBox *en;
 		QLineEdit *name;
@@ -45,7 +46,7 @@ private:
 	struct Extra {
 		obs_output_t *out;
 		obs_service_t *svc;
-		QString name;
+		int rowId; // Row::id this output belongs to (names may be blank/duplicated)
 		int polls;
 	};
 
@@ -59,4 +60,5 @@ private:
 	QVector<Extra> extras;
 	QTimer *pollTimer = nullptr;
 	bool streaming = false;
+	int rowSeq = 0; // monotonic Row::id source
 };

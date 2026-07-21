@@ -26,6 +26,7 @@ SymStudioEventSub::~SymStudioEventSub()
 
 void SymStudioEventSub::start(const QString &b, const QString &t, const QString &c)
 {
+	++connectGen; // invalidate any pending reconnect from a prior session
 	broadcasterId = b;
 	token = t;
 	clientId = c;
@@ -37,6 +38,7 @@ void SymStudioEventSub::start(const QString &b, const QString &t, const QString 
 
 void SymStudioEventSub::stop()
 {
+	++connectGen; // any queued reconnect lambda sees a stale gen and bails
 	live = false;
 	if (watchdog)
 		watchdog->stop();
@@ -50,6 +52,10 @@ void SymStudioEventSub::stop()
 	msgBuf.clear();
 	handshakeDone = false;
 	sessionId.clear();
+	// Clear credentials so nothing can silently reconnect after an explicit stop.
+	broadcasterId.clear();
+	token.clear();
+	clientId.clear();
 }
 
 void SymStudioEventSub::connectSocket(const QString &host, const QString &path)
@@ -132,6 +138,13 @@ void SymStudioEventSub::onReadyRead()
 			len = qFromBigEndian<quint64>((const uchar *)rx.constData() + pos);
 			pos += 8;
 		}
+		// Sanity ceiling: EventSub frames are tiny. A frame claiming a huge length is
+		// a protocol error (or a truncated/corrupt stream) — never wait to buffer it.
+		if (len > (16u * 1024u * 1024u)) {
+			emit status(QStringLiteral("EventSub: oversized frame — reconnecting"));
+			scheduleReconnect();
+			return;
+		}
 		const int maskLen = masked ? 4 : 0;
 		if ((quint64)rx.size() < (quint64)pos + maskLen + len)
 			return; // wait for the full payload
@@ -205,6 +218,8 @@ void SymStudioEventSub::scheduleReconnect()
 {
 	live = false;
 	handshakeDone = false;
+	if (watchdog)
+		watchdog->stop(); // don't let a stale keepalive watchdog schedule a second cycle
 	if (sock) {
 		sock->disconnect(this);
 		sock->abort();
@@ -214,8 +229,9 @@ void SymStudioEventSub::scheduleReconnect()
 	emit status(QStringLiteral("EventSub: reconnecting…"));
 	const int delay = reconnectDelayMs;
 	reconnectDelayMs = qMin(reconnectDelayMs * 2, 30000);
-	QTimer::singleShot(delay, this, [this]() {
-		if (!token.isEmpty())
+	const quint64 gen = connectGen;
+	QTimer::singleShot(delay, this, [this, gen]() {
+		if (gen == connectGen && !token.isEmpty())
 			connectSocket(QStringLiteral("eventsub.wss.twitch.tv"), QStringLiteral("/ws"));
 	});
 }
@@ -306,7 +322,9 @@ void SymStudioEventSub::subscribe(const QString &type, const QString &version, c
 	connect(reply, &QNetworkReply::finished, this, [this, reply]() {
 		reply->deleteLater();
 		const int code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-		if (code == 202 || code == 200) {
+		// 409 = subscription already exists (happens on session_reconnect, where the
+		// migrated session keeps its subs). Treat it as success so status stays "live".
+		if (code == 202 || code == 200 || code == 409) {
 			subOk++;
 		} else if (code == 401) {
 			emit status(QStringLiteral("EventSub: session expired — re-login in Stream Info"));

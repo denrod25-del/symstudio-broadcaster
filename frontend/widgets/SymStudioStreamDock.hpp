@@ -32,7 +32,7 @@ private:
 
 	void startDeviceFlow();
 	void fetchUser();
-	void loadChannelInfo();
+	void loadChannelInfo(bool allowRefresh = true);
 	bool tryRefreshThen();
 
 	QString clientId, accessToken, refreshToken, broadcasterId, login, deviceCode;

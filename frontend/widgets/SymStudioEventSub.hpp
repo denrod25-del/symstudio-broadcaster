@@ -57,4 +57,5 @@ private:
 	int keepaliveSecs = 30;
 	int subOk = 0, subTotal = 0;
 	int reconnectDelayMs = 1000;
+	quint64 connectGen = 0; // bumped on start()/stop() to cancel stale pending reconnects
 };
